@@ -51,4 +51,9 @@ public class UtenteService {
 
         utenteRepository.save(utente);
     }
+
+    public Utente trovaPerNickname(String nickname) {
+        return utenteRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    }
 }

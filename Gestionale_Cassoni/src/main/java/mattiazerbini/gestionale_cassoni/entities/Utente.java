@@ -19,7 +19,9 @@ public class Utente {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
-    private String ruolo;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Ruolo ruolo;
 
     private Boolean attivo = true;
 
@@ -31,7 +33,7 @@ public class Utente {
     }
 
     public Utente(String nome, String cognome, String nickname,
-                  String password, String ruolo,
+                  String password, Ruolo ruolo,
                   Boolean attivo, Mezzo mezzo) {
         this.nome = nome;
         this.cognome = cognome;
@@ -40,6 +42,14 @@ public class Utente {
         this.ruolo = ruolo;
         this.attivo = attivo;
         this.mezzo = mezzo;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -74,11 +84,11 @@ public class Utente {
         this.password = password;
     }
 
-    public String getRuolo() {
+    public Ruolo getRuolo() {
         return ruolo;
     }
 
-    public void setRuolo(String ruolo) {
+    public void setRuolo(Ruolo ruolo) {
         this.ruolo = ruolo;
     }
 
