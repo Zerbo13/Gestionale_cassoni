@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.enties;
+package mattiazerbini.gestionale_cassoni.entities;
 
 public enum StatoViaggio {
     IN_CORSO,

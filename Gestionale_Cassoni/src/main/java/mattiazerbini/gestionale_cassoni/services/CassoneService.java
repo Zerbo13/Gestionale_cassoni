@@ -1,0 +1,30 @@
+package mattiazerbini.gestionale_cassoni.services;
+
+import mattiazerbini.gestionale_cassoni.entities.Cassone;
+import mattiazerbini.gestionale_cassoni.repositories.CassoneRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CassoneService {
+
+    private final CassoneRepository cassoneRepository;
+
+    public CassoneService(CassoneRepository cassoneRepository) {
+        this.cassoneRepository = cassoneRepository;
+    }
+
+    public List<Cassone> trovaTuttiICassoni() {
+        return cassoneRepository.findAll();
+    }
+
+    public Optional<Cassone> trovaCassonePerId(Long id) {
+        return cassoneRepository.findById(id);
+    }
+
+    public Cassone salvaCassone(Cassone cassone) {
+        return cassoneRepository.save(cassone);
+    }
+}

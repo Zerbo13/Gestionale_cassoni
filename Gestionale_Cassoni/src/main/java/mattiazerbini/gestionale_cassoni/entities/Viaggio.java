@@ -1,7 +1,6 @@
 package mattiazerbini.gestionale_cassoni.entities;
 
 import jakarta.persistence.*;
-import mattiazerbini.gestionale_cassoni.enties.*;
 
 import java.time.LocalDateTime;
 
