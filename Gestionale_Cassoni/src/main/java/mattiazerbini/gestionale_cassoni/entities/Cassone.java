@@ -40,11 +40,11 @@ public class Cassone {
     public Cassone(){
     }
 
-    public String getCodice_cassone() {
+    public String getCodiceCassone() {
         return codice_cassone;
     }
 
-    public void setCodice_cassone(String codice_cassone) {
+    public void setCodiceCassone(String codice_cassone) {
         this.codice_cassone = codice_cassone;
     }
 
@@ -88,11 +88,11 @@ public class Cassone {
         this.attivo = attivo;
     }
 
-    public Luogo getPosizione_iniziale_id() {
+    public Luogo getPosizioneIniziale() {
         return posizioneIniziale;
     }
 
-    public void setPosizione_iniziale_id(Luogo posizione_iniziale_id) {
+    public void setPosizioneIniziale(Luogo posizioneIniziale) {
         this.posizioneIniziale = posizioneIniziale;
     }
 }

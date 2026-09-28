@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.controllers;
+package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.services.MezzoService;
@@ -33,5 +33,19 @@ public class MezzoController {
     @PostMapping
     public Mezzo creaMezzo(@RequestBody Mezzo mezzo) {
         return mezzoService.salvaMezzo(mezzo);
+    }
+
+    @PutMapping("/{id}")
+    public Mezzo modificaMezzo(
+            @PathVariable Long id,
+            @RequestBody Mezzo mezzo
+    ) {
+        return mezzoService.modificaMezzo(id, mezzo);
+    }
+
+    @PutMapping("/{id}/disattiva")
+    public ResponseEntity<Void> disattivaMezzo(@PathVariable Long id) {
+        mezzoService.disattivaMezzo(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -27,4 +27,28 @@ public class CassoneService {
     public Cassone salvaCassone(Cassone cassone) {
         return cassoneRepository.save(cassone);
     }
+
+    public Cassone modificaCassone(Long id, Cassone cassoneModificato) {
+
+        Cassone cassone = cassoneRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
+
+        cassone.setCodiceCassone(cassoneModificato.getCodiceCassone());
+        cassone.setColore(cassoneModificato.getColore());
+        cassone.setMisura(cassoneModificato.getMisura());
+        cassone.setTipologia(cassoneModificato.getTipologia());
+        cassone.setPosizioneIniziale(cassoneModificato.getPosizioneIniziale());
+
+        return cassoneRepository.save(cassone);
+    }
+
+    public void disattivaCassone(Long id) {
+
+        Cassone cassone = cassoneRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
+
+        cassone.setAttivo(false);
+
+        cassoneRepository.save(cassone);
+    }
 }

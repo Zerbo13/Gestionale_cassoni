@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.controllers;
+package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
@@ -33,5 +33,19 @@ public class LuogoController {
     @PostMapping
     public Luogo creaLuogo(@RequestBody Luogo luogo) {
         return luogoService.salvaLuogo(luogo);
+    }
+
+    @PutMapping("/{id}")
+    public Luogo modificaLuogo(
+            @PathVariable Long id,
+            @RequestBody Luogo luogo
+    ) {
+        return luogoService.modificaLuogo(id, luogo);
+    }
+
+    @PutMapping("/{id}/disattiva")
+    public ResponseEntity<Void> disattivaLuogo(@PathVariable Long id) {
+        luogoService.disattivaLuogo(id);
+        return ResponseEntity.noContent().build();
     }
 }

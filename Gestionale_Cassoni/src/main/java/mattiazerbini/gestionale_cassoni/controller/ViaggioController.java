@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.controllers;
+package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Viaggio;
 import mattiazerbini.gestionale_cassoni.services.ViaggioService;
@@ -30,8 +30,18 @@ public class ViaggioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Viaggio creaViaggio(@RequestBody Viaggio viaggio) {
-        return viaggioService.salvaViaggio(viaggio);
+    @PostMapping("/avvia")
+    public Viaggio avviaViaggio(@RequestBody Viaggio viaggio) {
+        return viaggioService.avviaViaggio(viaggio);
+    }
+
+    @PutMapping("/{id}/chiudi")
+    public Viaggio chiudiViaggio(@PathVariable Long id) {
+        return viaggioService.chiudiViaggio(id);
+    }
+
+    @PutMapping("/{id}/annulla")
+    public Viaggio annullaViaggio(@PathVariable Long id) {
+        return viaggioService.annullaViaggio(id);
     }
 }

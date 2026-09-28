@@ -27,4 +27,23 @@ public class MezzoService {
     public Mezzo salvaMezzo(Mezzo mezzo) {
         return mezzoRepository.save(mezzo);
     }
+
+    public Mezzo modificaMezzo(Long id, Mezzo mezzoModificato) {
+        Mezzo mezzo = mezzoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+
+        mezzo.setTarga(mezzoModificato.getTarga());
+        mezzo.setModello(mezzoModificato.getModello());
+        mezzo.setTipologia(mezzoModificato.getTipologia());
+
+        return mezzoRepository.save(mezzo);
+    }
+
+    public void disattivaMezzo(Long id) {
+        Mezzo mezzo = mezzoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+
+        mezzo.setAttivo(false);
+        mezzoRepository.save(mezzo);
+    }
 }

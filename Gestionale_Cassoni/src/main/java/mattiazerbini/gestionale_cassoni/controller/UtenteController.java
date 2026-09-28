@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.controllers;
+package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Utente;
 import mattiazerbini.gestionale_cassoni.services.UtenteService;
@@ -33,5 +33,21 @@ public class UtenteController {
     @PostMapping
     public Utente creaUtente(@RequestBody Utente utente) {
         return utenteService.salvaUtente(utente);
+    }
+
+    @PutMapping("/{id}")
+    public Utente modificaUtente(
+            @PathVariable Long id,
+            @RequestBody Utente utente
+    ) {
+        return utenteService.modificaUtente(id, utente);
+    }
+
+    @PutMapping("/{id}/disattiva")
+    public ResponseEntity<Void> disattivaUtente(@PathVariable Long id) {
+
+        utenteService.disattivaUtente(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

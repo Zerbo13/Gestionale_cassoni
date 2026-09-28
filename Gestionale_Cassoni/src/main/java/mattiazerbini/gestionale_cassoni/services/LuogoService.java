@@ -27,4 +27,23 @@ public class LuogoService {
     public Luogo salvaLuogo(Luogo luogo) {
         return luogoRepository.save(luogo);
     }
+
+    public Luogo modificaLuogo(Long id, Luogo luogoModificato) {
+        Luogo luogo = luogoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
+
+        luogo.setNome(luogoModificato.getNome());
+        luogo.setIndirizzo(luogoModificato.getIndirizzo());
+        luogo.setTipologia(luogoModificato.getTipologia());
+
+        return luogoRepository.save(luogo);
+    }
+
+    public void disattivaLuogo(Long id) {
+        Luogo luogo = luogoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
+
+        luogo.setAttivo(false);
+        luogoRepository.save(luogo);
+    }
 }

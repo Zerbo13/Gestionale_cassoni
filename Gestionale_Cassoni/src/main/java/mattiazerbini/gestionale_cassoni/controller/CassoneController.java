@@ -1,4 +1,4 @@
-package mattiazerbini.gestionale_cassoni.controllers;
+package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.services.CassoneService;
@@ -33,5 +33,21 @@ public class CassoneController {
     @PostMapping
     public Cassone creaCassone(@RequestBody Cassone cassone) {
         return cassoneService.salvaCassone(cassone);
+    }
+
+    @PutMapping("/{id}")
+    public Cassone modificaCassone(
+            @PathVariable Long id,
+            @RequestBody Cassone cassone
+    ) {
+        return cassoneService.modificaCassone(id, cassone);
+    }
+
+    @PutMapping("/{id}/disattiva")
+    public ResponseEntity<Void> disattivaCassone(@PathVariable Long id) {
+
+        cassoneService.disattivaCassone(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

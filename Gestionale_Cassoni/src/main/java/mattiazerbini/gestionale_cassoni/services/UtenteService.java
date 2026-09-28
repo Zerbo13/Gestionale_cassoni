@@ -28,5 +28,27 @@ public class UtenteService {
         return utenteRepository.save(utente);
     }
 
+    public Utente modificaUtente(Long id, Utente utenteModificato) {
 
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        utente.setNome(utenteModificato.getNome());
+        utente.setCognome(utenteModificato.getCognome());
+        utente.setNickname(utenteModificato.getNickname());
+        utente.setRuolo(utenteModificato.getRuolo());
+        utente.setMezzo(utenteModificato.getMezzo());
+
+        return utenteRepository.save(utente);
+    }
+
+    public void disattivaUtente(Long id) {
+
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        utente.setAttivo(false);
+
+        utenteRepository.save(utente);
+    }
 }
