@@ -16,7 +16,7 @@ public class UtenteService {
         this.utenteRepository = utenteRepository;
     }
 
-    public List<Utente> trovaTuttiUtenti() {
+    public List<Utente> trovaTuttiGliUtenti() {
         return utenteRepository.findAll();
     }
 
@@ -27,4 +27,6 @@ public class UtenteService {
     public Utente salvaUtente(Utente utente) {
         return utenteRepository.save(utente);
     }
+
+
 }
