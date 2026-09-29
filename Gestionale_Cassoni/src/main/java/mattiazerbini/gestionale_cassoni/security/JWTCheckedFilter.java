@@ -50,21 +50,19 @@ public class JWTCheckedFilter extends OncePerRequestFilter {
 
         try {
 
-            // Controllo che il token sia valido
             jwtTools.verifyToken(token);
 
-            // Recupero l'id dell'utente dal token
             Long userId = jwtTools.extractIdFromToken(token);
 
-            // Recupero l'utente dal database
             Utente utente = utenteService.trovaUtentePerId(userId)
                     .orElseThrow(() ->
                             new RuntimeException("Utente non trovato")
                     );
 
-            // Utente disattivato = niente accesso
             if (!utente.getAttivo()) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(
+                        HttpServletResponse.SC_UNAUTHORIZED
+                );
                 return;
             }
 
@@ -84,13 +82,15 @@ public class JWTCheckedFilter extends OncePerRequestFilter {
                     .getContext()
                     .setAuthentication(authentication);
 
-            filterChain.doFilter(request, response);
-
         } catch (Exception ex) {
 
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
             );
+
+            return;
         }
+
+        filterChain.doFilter(request, response);
     }
 }

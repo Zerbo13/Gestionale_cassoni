@@ -2,6 +2,7 @@ package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.services.CassoneService;
+import mattiazerbini.gestionale_cassoni.services.ViaggioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +14,15 @@ import java.util.List;
 public class CassoneController {
 
     private final CassoneService cassoneService;
+    private final ViaggioService viaggioService;
 
-    public CassoneController(CassoneService cassoneService) {
+    public CassoneController(
+            CassoneService cassoneService,
+            ViaggioService viaggioService
+    ) {
         this.cassoneService = cassoneService;
+        this.viaggioService = viaggioService;
     }
-
     @GetMapping
     public List<Cassone> getTuttiICassoni() {
         return cassoneService.trovaTuttiICassoni();
@@ -49,5 +54,17 @@ public class CassoneController {
         cassoneService.disattivaCassone(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/posizione")
+    public ResponseEntity<String> getPosizioneAttuale(@PathVariable Long id) {
+
+        return cassoneService.trovaCassonePerId(id)
+                .map(cassone ->
+                        ResponseEntity.ok(
+                                viaggioService.trovaPosizioneAttualeCassone(cassone)
+                        )
+                )
+                .orElse(ResponseEntity.notFound().build());
     }
 }

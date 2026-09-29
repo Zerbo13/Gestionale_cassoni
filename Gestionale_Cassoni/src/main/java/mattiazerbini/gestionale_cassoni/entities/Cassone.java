@@ -40,6 +40,14 @@ public class Cassone {
     public Cassone(){
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getCodiceCassone() {
         return codice_cassone;
     }

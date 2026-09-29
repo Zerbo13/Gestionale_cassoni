@@ -50,18 +50,14 @@ public class ViaggioController {
         Cassone cassone = cassoneService.trovaCassonePerId(request.getCassoneId())
                 .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
 
-        Luogo partenza = luogoService.trovaLuogoPerId(request.getPartenzaId())
-                .orElseThrow(() -> new RuntimeException("Luogo di partenza non trovato"));
-
         Luogo destinazione = luogoService.trovaLuogoPerId(request.getDestinazioneId())
-                .orElseThrow(() -> new RuntimeException("Luogo di destinazione non trovato"));
+                .orElseThrow(() -> new RuntimeException("Destinazione non trovato"));
 
         Viaggio viaggio = new Viaggio();
 
         viaggio.setUtente(utente);
         viaggio.setMezzo(mezzo);
         viaggio.setCassone(cassone);
-        viaggio.setPartenza(partenza);
         viaggio.setDestinazione(destinazione);
         viaggio.setNote(request.getNote());
 
