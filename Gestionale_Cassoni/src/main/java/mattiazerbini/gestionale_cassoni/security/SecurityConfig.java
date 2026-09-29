@@ -52,9 +52,14 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(auth -> auth
 
                 // LOGIN
-                .requestMatchers("/auth/**", "/error").permitAll()
+                .requestMatchers(
+                        "/auth/**",
+                        "/error"
+                ).permitAll()
+
 
                 // LUOGHI
+
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/luoghi/**"
@@ -72,6 +77,7 @@ public class SecurityConfig {
 
 
                 // MEZZI
+
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/mezzi/**"
@@ -89,6 +95,7 @@ public class SecurityConfig {
 
 
                 // CASSONI
+
                 .requestMatchers(
                         HttpMethod.GET,
                         "/api/cassoni/**"
@@ -106,17 +113,39 @@ public class SecurityConfig {
 
 
                 // UTENTI
+
                 .requestMatchers(
                         "/api/utenti/**"
                 ).hasAuthority("ADMIN")
 
 
                 // VIAGGI
+
+                // Tutti i viaggi -> solo ADMIN
                 .requestMatchers(
                         HttpMethod.GET,
-                        "/api/viaggi/**"
+                        "/api/viaggi"
+                ).hasAuthority("ADMIN")
+
+                // Viaggi di oggi -> solo ADMIN
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/viaggi/oggi"
+                ).hasAuthority("ADMIN")
+
+                // Viaggi dell'utente autenticato
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/viaggi/miei"
                 ).authenticated()
 
+                // Storico viaggi di un cassone
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/viaggi/cassone/**"
+                ).authenticated()
+
+                // Avvio viaggio
                 .requestMatchers(
                         HttpMethod.POST,
                         "/api/viaggi/**"
@@ -125,6 +154,7 @@ public class SecurityConfig {
                         "ADMIN"
                 )
 
+                // Chiusura / annullamento viaggio
                 .requestMatchers(
                         HttpMethod.PUT,
                         "/api/viaggi/**"
@@ -134,7 +164,7 @@ public class SecurityConfig {
                 )
 
 
-                // Qualsiasi altra richiesta richiede il login
+                // QUALSIASI ALTRA RICHIESTA
                 .anyRequest().authenticated()
         );
 

@@ -1,11 +1,13 @@
 package mattiazerbini.gestionale_cassoni.services;
 
+import mattiazerbini.gestionale_cassoni.dto.ViaggioResponse;
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.StatoViaggio;
 import mattiazerbini.gestionale_cassoni.entities.Viaggio;
 import mattiazerbini.gestionale_cassoni.repositories.ViaggioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,36 @@ public class ViaggioService {
         return viaggioRepository.findAll();
     }
 
+    public List<Viaggio> trovaViaggiPerCassone(Long cassoneId){
+        return viaggioRepository.findByCassoneIdOrderByDataOraInizioDesc(cassoneId);
+    }
+
+    public List<Viaggio> trovaViaggiPerUtente(Long utenteId){
+        return viaggioRepository.findByUtenteIdOrderByDataOraInizioDesc(utenteId);
+    }
+
     public Optional<Viaggio> trovaViaggioPerId(Long id) {
         return viaggioRepository.findById(id);
+    }
+
+    public List<Viaggio> trovaViaggiDiOggi(){
+        LocalDateTime dataInizio = LocalDate.now().atStartOfDay();
+        LocalDateTime dataFine = LocalDate.now().plusDays(1).atStartOfDay();
+
+        return viaggioRepository.findByDataOraInizioBetweenOrderByDataOraInizioDesc(dataInizio, dataFine);
+    }
+
+    public ViaggioResponse convetiInResponse(Viaggio viaggio){
+        return new ViaggioResponse( viaggio.getId(),
+                viaggio.getUtente().getNome() +" "+ viaggio.getUtente().getCognome(),
+                viaggio.getMezzo().getTarga() +" "+ viaggio.getMezzo().getModello(),
+                viaggio.getCassone().getCodiceCassone(),
+                viaggio.getPartenza().getNome(),
+                viaggio.getDestinazione().getNome(),
+                viaggio.getDataOraInizio(),
+                viaggio.getDataOraFine(),
+                viaggio.getStato(),
+                viaggio.getNote());
     }
 
     public Viaggio avviaViaggio(Viaggio viaggio) {
