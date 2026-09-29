@@ -1,4 +1,5 @@
 package mattiazerbini.gestionale_cassoni.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +17,7 @@ public class Utente {
     @Column(nullable = false, unique = true)
     private String nickname;
 
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false)
     private String password;
 

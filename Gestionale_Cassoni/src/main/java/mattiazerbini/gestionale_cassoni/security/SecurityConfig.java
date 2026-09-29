@@ -35,6 +35,10 @@ public class SecurityConfig {
                 formLogin -> formLogin.disable()
         );
 
+        httpSecurity.httpBasic(
+                httpBasic -> httpBasic.disable()
+        );
+
         httpSecurity.csrf(
                 csrf -> csrf.disable()
         );
@@ -48,7 +52,7 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(auth -> auth
 
                 // LOGIN
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/auth/**", "/error").permitAll()
 
                 // LUOGHI
                 .requestMatchers(

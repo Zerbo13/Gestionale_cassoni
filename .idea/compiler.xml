@@ -12,6 +12,9 @@
         <module name="Gestionale_Cassoni" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Gestionale_Cassoni" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
