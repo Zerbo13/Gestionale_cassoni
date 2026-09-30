@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.LuogoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
@@ -41,24 +42,25 @@ public class LuogoController {
     }
 
     @PostMapping
-    public Luogo creaLuogo(@RequestBody LuogoRequest request) {
+    public Luogo creaLuogo(@Valid @RequestBody LuogoRequest request) {
 
         Luogo luogo = new Luogo();
+
         luogo.setNome(request.getNome());
         luogo.setIndirizzo(request.getIndirizzo());
         luogo.setTipologia(request.getTipologia());
-
         luogo.setAttivo(true);
 
         return luogoService.salvaLuogo(luogo);
     }
 
     @PutMapping("/{id}")
-    public Luogo modificaLuogo(@PathVariable Long id, @RequestBody LuogoRequest request) {
+    public Luogo modificaLuogo(@PathVariable Long id, @Valid @RequestBody LuogoRequest request) {
 
         Luogo luogo = luogoService
                 .trovaLuogoPerId(id)
                 .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
+
         luogo.setNome(request.getNome());
         luogo.setIndirizzo(request.getIndirizzo());
         luogo.setTipologia(request.getTipologia());
@@ -68,6 +70,7 @@ public class LuogoController {
 
     @PutMapping("/{id}/disattiva")
     public ResponseEntity<Luogo> disattivaLuogo(@PathVariable Long id) {
+
         Luogo luogo = luogoService.disattivaLuogo(id);
 
         return ResponseEntity.ok(luogo);
@@ -76,8 +79,7 @@ public class LuogoController {
     @PutMapping("/{id}/attiva")
     public ResponseEntity<Luogo> attivaLuogo(@PathVariable Long id) {
 
-        Luogo luogo =
-                luogoService.attivaLuogo(id);
+        Luogo luogo = luogoService.attivaLuogo(id);
 
         return ResponseEntity.ok(luogo);
     }

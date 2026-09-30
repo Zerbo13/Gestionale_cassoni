@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.CassoneRequest;
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
@@ -48,7 +49,7 @@ public class CassoneController {
     }
 
     @PostMapping
-    public Cassone creaCassone(@RequestBody CassoneRequest request) {
+    public Cassone creaCassone(@Valid @RequestBody CassoneRequest request) {
 
         Luogo posizioneIniziale = luogoService.trovaLuogoPerId(request.getPosizioneInizialeId())
                 .orElseThrow(() -> new NotFoundException("Posizione iniziale non trovata"));
@@ -67,7 +68,7 @@ public class CassoneController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cassone> modificaCassone(@PathVariable Long id, @RequestBody CassoneRequest request) {
+    public ResponseEntity<Cassone> modificaCassone(@PathVariable Long id, @Valid @RequestBody CassoneRequest request) {
 
         Cassone cassone = cassoneService.trovaCassonePerId(id)
                 .orElseThrow(() -> new NotFoundException("Cassone non trovato"));

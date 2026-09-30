@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.MezzoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
@@ -41,25 +42,25 @@ public class MezzoController {
     }
 
     @PostMapping
-    public Mezzo creaMezzo(@RequestBody MezzoRequest request) {
+    public Mezzo creaMezzo(@Valid @RequestBody MezzoRequest request) {
 
         Mezzo mezzo = new Mezzo();
 
         mezzo.setTarga(request.getTarga());
         mezzo.setModello(request.getModello());
         mezzo.setTipologia(request.getTipo());
-
         mezzo.setAttivo(true);
 
         return mezzoService.salvaMezzo(mezzo);
     }
 
     @PutMapping("/{id}")
-    public Mezzo modificaMezzo(@PathVariable Long id, @RequestBody MezzoRequest request) {
+    public Mezzo modificaMezzo(@PathVariable Long id, @Valid @RequestBody MezzoRequest request) {
 
         Mezzo mezzo = mezzoService
                 .trovaMezzoPerId(id)
                 .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
+
         mezzo.setTarga(request.getTarga());
         mezzo.setModello(request.getModello());
         mezzo.setTipologia(request.getTipo());
@@ -69,6 +70,7 @@ public class MezzoController {
 
     @PutMapping("/{id}/disattiva")
     public ResponseEntity<Mezzo> disattivaMezzo(@PathVariable Long id) {
+
         Mezzo mezzo = mezzoService.disattivaMezzo(id);
 
         return ResponseEntity.ok(mezzo);
@@ -76,6 +78,7 @@ public class MezzoController {
 
     @PutMapping("/{id}/attiva")
     public ResponseEntity<Mezzo> attivaMezzo(@PathVariable Long id) {
+
         Mezzo mezzo = mezzoService.attivaMezzo(id);
 
         return ResponseEntity.ok(mezzo);

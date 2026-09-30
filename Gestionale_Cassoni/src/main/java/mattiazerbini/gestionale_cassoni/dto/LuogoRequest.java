@@ -1,9 +1,16 @@
 package mattiazerbini.gestionale_cassoni.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LuogoRequest {
 
+    @NotBlank(message = "Il nome è obbligatorio")
     private String nome;
+
+    @NotBlank(message = "L'indirizzo è obbligatorio")
     private String indirizzo;
+
+    @NotBlank(message = "La tipologia è obbligatoria")
     private String tipologia;
 
     public LuogoRequest() {

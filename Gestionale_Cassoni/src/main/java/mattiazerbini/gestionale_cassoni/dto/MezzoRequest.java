@@ -1,9 +1,16 @@
 package mattiazerbini.gestionale_cassoni.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class MezzoRequest {
 
+    @NotBlank(message = "La targa è obbligatoria")
     private String targa;
+
+    @NotBlank(message = "Il modello è obbligatorio")
     private String modello;
+
+    @NotBlank(message = "Il tipo è obbligatorio")
     private String tipo;
 
     public MezzoRequest() {

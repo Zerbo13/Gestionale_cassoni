@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.dto.UtenteRequest;
+import mattiazerbini.gestionale_cassoni.dto.UtenteUpdateRequest;
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.entities.Ruolo;
 import mattiazerbini.gestionale_cassoni.entities.Utente;
@@ -9,6 +10,7 @@ import mattiazerbini.gestionale_cassoni.services.MezzoService;
 import mattiazerbini.gestionale_cassoni.services.UtenteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class UtenteController {
     }
 
     @PostMapping
-    public Utente creaUtente(@RequestBody UtenteRequest request) {
+    public Utente creaUtente(@Valid @RequestBody UtenteRequest request) {
 
         Utente utente = new Utente();
         utente.setNome(request.getNome());
@@ -73,7 +75,7 @@ public class UtenteController {
     }
 
     @PutMapping("/{id}")
-    public Utente modificaUtente(@PathVariable Long id, @RequestBody UtenteRequest request) {
+    public Utente modificaUtente(@PathVariable Long id, @Valid @RequestBody UtenteUpdateRequest request) {
 
         Utente utente = utenteService
                 .trovaUtentePerId(id)

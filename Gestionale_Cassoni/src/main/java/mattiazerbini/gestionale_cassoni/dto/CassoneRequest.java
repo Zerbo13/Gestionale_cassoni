@@ -1,25 +1,32 @@
 package mattiazerbini.gestionale_cassoni.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class CassoneRequest {
 
+    @NotBlank(message = "Il codice cassone è obbligatorio")
     private String codiceCassone;
+
+    @NotBlank(message = "Il colore è obbligatorio")
     private String colore;
+
+    @NotBlank(message = "La misura è obbligatoria")
     private String misura;
+
+    @NotBlank(message = "La tipologia è obbligatoria")
     private String tipologia;
+
+    @NotBlank(message = "La capacità è obbligatoria")
     private String capacità;
+
+    @NotNull(message = "La posizione iniziale è obbligatoria")
     private Long posizioneInizialeId;
 
     public CassoneRequest() {
     }
 
-    public CassoneRequest(
-            String codiceCassone,
-            String colore,
-            String misura,
-            String tipologia,
-            String capacità,
-            Long posizioneInizialeId
-    ) {
+    public CassoneRequest(String codiceCassone, String colore, String misura, String tipologia, String capacità, Long posizioneInizialeId) {
         this.codiceCassone = codiceCassone;
         this.colore = colore;
         this.misura = misura;

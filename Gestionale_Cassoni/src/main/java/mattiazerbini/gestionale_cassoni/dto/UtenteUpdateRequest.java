@@ -1,9 +1,8 @@
 package mattiazerbini.gestionale_cassoni.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
-public class UtenteRequest {
+public class UtenteUpdateRequest {
 
     @NotBlank(message = "Il nome è obbligatorio")
     private String nome;
@@ -14,24 +13,19 @@ public class UtenteRequest {
     @NotBlank(message = "Il nickname è obbligatorio")
     private String nickname;
 
-    @NotBlank(message = "La password è obbligatoria")
-    @Size(min = 5, message = "la password deve contenere almeno 6 caratteri")
-    private String password;
-
     @NotBlank(message = "Il ruolo è obbligatorio")
     private String ruolo;
 
     private Long mezzoId;
 
-    public UtenteRequest() {
+    public UtenteUpdateRequest() {
     }
 
-    public UtenteRequest(String nome, String cognome, String nickname,
-                         String password, String ruolo, Long mezzoId) {
+    public UtenteUpdateRequest(String nome, String cognome, String nickname, String ruolo, Long mezzoId) {
+
         this.nome = nome;
         this.cognome = cognome;
         this.nickname = nickname;
-        this.password = password;
         this.ruolo = ruolo;
         this.mezzoId = mezzoId;
     }
@@ -58,14 +52,6 @@ public class UtenteRequest {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getRuolo() {
