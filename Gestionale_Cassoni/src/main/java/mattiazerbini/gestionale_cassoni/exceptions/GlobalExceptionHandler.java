@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(
-            NotFoundException ex
-    ) {
+    public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
@@ -19,9 +17,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequestException(
-            BadRequestException ex
-    ) {
+    public ResponseEntity<String> handleBadRequestException(BadRequestException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
@@ -29,9 +25,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<String> handleForbiddenException(
-            ForbiddenException ex
-    ) {
+    public ResponseEntity<String> handleForbiddenException(ForbiddenException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ex.getMessage());

@@ -2,6 +2,7 @@ package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.dto.MezzoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.MezzoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,19 @@ public class MezzoController {
         return mezzoService.trovaTuttiIMezzi();
     }
 
+    @GetMapping("/attivi")
+    public List<Mezzo> getMezziAttivi() {
+        return mezzoService.trovaMezziAttivi();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Mezzo> getMezzoPerId(@PathVariable Long id) {
-        return mezzoService.trovaMezzoPerId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        Mezzo mezzo = mezzoService
+                .trovaMezzoPerId(id)
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
+
+        return ResponseEntity.ok(mezzo);
     }
 
     @PostMapping
@@ -39,6 +48,7 @@ public class MezzoController {
         mezzo.setTarga(request.getTarga());
         mezzo.setModello(request.getModello());
         mezzo.setTipologia(request.getTipo());
+
         mezzo.setAttivo(true);
 
         return mezzoService.salvaMezzo(mezzo);
@@ -47,9 +57,9 @@ public class MezzoController {
     @PutMapping("/{id}")
     public Mezzo modificaMezzo(@PathVariable Long id, @RequestBody MezzoRequest request) {
 
-        Mezzo mezzo = mezzoService.trovaMezzoPerId(id)
-                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
-
+        Mezzo mezzo = mezzoService
+                .trovaMezzoPerId(id)
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
         mezzo.setTarga(request.getTarga());
         mezzo.setModello(request.getModello());
         mezzo.setTipologia(request.getTipo());
@@ -58,19 +68,16 @@ public class MezzoController {
     }
 
     @PutMapping("/{id}/disattiva")
-    public ResponseEntity<Void> disattivaMezzo(@PathVariable Long id) {
-        mezzoService.disattivaMezzo(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Mezzo> disattivaMezzo(@PathVariable Long id) {
+        Mezzo mezzo = mezzoService.disattivaMezzo(id);
+
+        return ResponseEntity.ok(mezzo);
     }
 
     @PutMapping("/{id}/attiva")
     public ResponseEntity<Mezzo> attivaMezzo(@PathVariable Long id) {
         Mezzo mezzo = mezzoService.attivaMezzo(id);
-        return ResponseEntity.ok(mezzo);
-    }
 
-    @GetMapping("/attivi")
-    public List<Mezzo> getMezziAttivi() {
-        return mezzoService.trovaMezziAttivi();
+        return ResponseEntity.ok(mezzo);
     }
 }

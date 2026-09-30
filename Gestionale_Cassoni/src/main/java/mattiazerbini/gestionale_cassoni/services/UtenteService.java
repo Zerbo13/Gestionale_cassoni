@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Utente;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.UtenteRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,6 @@ public class UtenteService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     public List<Utente> trovaTuttiGliUtenti() {
         return utenteRepository.findAll();
     }
@@ -29,15 +29,15 @@ public class UtenteService {
     }
 
     public Utente salvaUtente(Utente utente) {
-
         utente.setPassword(passwordEncoder.encode(utente.getPassword()));
-    return utenteRepository.save(utente);
+
+        return utenteRepository.save(utente);
     }
 
     public Utente modificaUtente(Long id, Utente utenteModificato) {
 
         Utente utente = utenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
         utente.setNome(utenteModificato.getNome());
         utente.setCognome(utenteModificato.getCognome());
@@ -48,30 +48,34 @@ public class UtenteService {
         return utenteRepository.save(utente);
     }
 
-    public void disattivaUtente(Long id) {
+    public Utente disattivaUtente(Long id) {
 
         Utente utente = utenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
         utente.setAttivo(false);
 
-        utenteRepository.save(utente);
+        return utenteRepository.save(utente);
+    }
+
+    public Utente attivaUtente(Long id) {
+
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
+
+        utente.setAttivo(true);
+
+        return utenteRepository.save(utente);
     }
 
     public Utente trovaPerNickname(String nickname) {
-        return utenteRepository.findByNicknameIgnoreCase(nickname)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        return utenteRepository
+                .findByNicknameIgnoreCase(nickname)
+                .orElseThrow(() -> new NotFoundException("Credenziali non valide"));
     }
 
     public List<Utente> trovaUtentiAttivi() {
         return utenteRepository.findByAttivoTrue();
-    }
-
-    public Utente attivaUtente(Long id) {
-        Utente utente = utenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
-        utente.setAttivo(true);
-
-        return utenteRepository.save(utente);
     }
 }

@@ -2,6 +2,7 @@ package mattiazerbini.gestionale_cassoni.controller;
 
 import mattiazerbini.gestionale_cassoni.dto.LuogoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,21 +25,29 @@ public class LuogoController {
         return luogoService.trovaTuttiILuoghi();
     }
 
+    @GetMapping("/attivi")
+    public List<Luogo> getTuttiILuoghiAttivi() {
+        return luogoService.trovaLuoghiAttivi();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Luogo> getLuogoPerId(@PathVariable Long id) {
-        return luogoService.trovaLuogoPerId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        Luogo luogo = luogoService
+                .trovaLuogoPerId(id)
+                .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
+
+        return ResponseEntity.ok(luogo);
     }
 
     @PostMapping
     public Luogo creaLuogo(@RequestBody LuogoRequest request) {
 
         Luogo luogo = new Luogo();
-
         luogo.setNome(request.getNome());
         luogo.setIndirizzo(request.getIndirizzo());
         luogo.setTipologia(request.getTipologia());
+
         luogo.setAttivo(true);
 
         return luogoService.salvaLuogo(luogo);
@@ -47,9 +56,9 @@ public class LuogoController {
     @PutMapping("/{id}")
     public Luogo modificaLuogo(@PathVariable Long id, @RequestBody LuogoRequest request) {
 
-        Luogo luogo = luogoService.trovaLuogoPerId(id)
-                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
-
+        Luogo luogo = luogoService
+                .trovaLuogoPerId(id)
+                .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
         luogo.setNome(request.getNome());
         luogo.setIndirizzo(request.getIndirizzo());
         luogo.setTipologia(request.getTipologia());
@@ -58,13 +67,18 @@ public class LuogoController {
     }
 
     @PutMapping("/{id}/disattiva")
-    public ResponseEntity<Void> disattivaLuogo(@PathVariable Long id) {
-        luogoService.disattivaLuogo(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Luogo> disattivaLuogo(@PathVariable Long id) {
+        Luogo luogo = luogoService.disattivaLuogo(id);
+
+        return ResponseEntity.ok(luogo);
     }
 
-    @GetMapping("/attivi")
-    public List<Luogo> getTuttiILuoghiAttivi() {
-        return luogoService.trovaLuoghiAttivi();
+    @PutMapping("/{id}/attiva")
+    public ResponseEntity<Luogo> attivaLuogo(@PathVariable Long id) {
+
+        Luogo luogo =
+                luogoService.attivaLuogo(id);
+
+        return ResponseEntity.ok(luogo);
     }
 }

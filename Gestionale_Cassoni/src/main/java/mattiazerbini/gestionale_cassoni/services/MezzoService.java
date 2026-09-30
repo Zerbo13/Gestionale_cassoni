@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.MezzoRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +30,9 @@ public class MezzoService {
     }
 
     public Mezzo modificaMezzo(Long id, Mezzo mezzoModificato) {
+
         Mezzo mezzo = mezzoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
         mezzo.setTarga(mezzoModificato.getTarga());
         mezzo.setModello(mezzoModificato.getModello());
@@ -39,26 +41,27 @@ public class MezzoService {
         return mezzoRepository.save(mezzo);
     }
 
-    public void disattivaMezzo(Long id) {
+    public Mezzo disattivaMezzo(Long id) {
+
         Mezzo mezzo = mezzoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
         mezzo.setAttivo(false);
-        mezzoRepository.save(mezzo);
-    }
 
-    public List<Mezzo> trovaMezziAttivi() {
-        return mezzoRepository.findByAttivoTrue();
+        return mezzoRepository.save(mezzo);
     }
-
 
     public Mezzo attivaMezzo(Long id) {
 
         Mezzo mezzo = mezzoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
         mezzo.setAttivo(true);
 
         return mezzoRepository.save(mezzo);
+    }
+
+    public List<Mezzo> trovaMezziAttivi() {
+        return mezzoRepository.findByAttivoTrue();
     }
 }

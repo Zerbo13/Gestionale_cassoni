@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.LuogoRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +30,9 @@ public class LuogoService {
     }
 
     public Luogo modificaLuogo(Long id, Luogo luogoModificato) {
-        Luogo luogo = luogoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
 
+        Luogo luogo = luogoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
         luogo.setNome(luogoModificato.getNome());
         luogo.setIndirizzo(luogoModificato.getIndirizzo());
         luogo.setTipologia(luogoModificato.getTipologia());
@@ -39,12 +40,24 @@ public class LuogoService {
         return luogoRepository.save(luogo);
     }
 
-    public void disattivaLuogo(Long id) {
+    public Luogo disattivaLuogo(Long id) {
+
         Luogo luogo = luogoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
+                .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
 
         luogo.setAttivo(false);
-        luogoRepository.save(luogo);
+
+        return luogoRepository.save(luogo);
+    }
+
+    public Luogo attivaLuogo(Long id) {
+
+        Luogo luogo = luogoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Luogo non trovato"));
+
+        luogo.setAttivo(true);
+
+        return luogoRepository.save(luogo);
     }
 
     public List<Luogo> trovaLuoghiAttivi() {

@@ -4,6 +4,7 @@ import mattiazerbini.gestionale_cassoni.dto.UtenteRequest;
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.entities.Ruolo;
 import mattiazerbini.gestionale_cassoni.entities.Utente;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.MezzoService;
 import mattiazerbini.gestionale_cassoni.services.UtenteService;
 import org.springframework.http.ResponseEntity;
@@ -19,38 +20,49 @@ public class UtenteController {
     private final UtenteService utenteService;
     private final MezzoService mezzoService;
 
-    public UtenteController(UtenteService utenteService, MezzoService mezzoService) {
+    public UtenteController(
+            UtenteService utenteService,
+            MezzoService mezzoService
+    ) {
         this.utenteService = utenteService;
         this.mezzoService = mezzoService;
     }
+
     @GetMapping
     public List<Utente> getTuttiGliUtenti() {
         return utenteService.trovaTuttiGliUtenti();
     }
 
+    @GetMapping("/attivi")
+    public List<Utente> getUtentiAttivi() {
+        return utenteService.trovaUtentiAttivi();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Utente> getUtentePerId(@PathVariable Long id) {
-        return utenteService.trovaUtentePerId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        Utente utente = utenteService
+                .trovaUtentePerId(id)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
+
+        return ResponseEntity.ok(utente);
     }
 
     @PostMapping
     public Utente creaUtente(@RequestBody UtenteRequest request) {
 
         Utente utente = new Utente();
-
         utente.setNome(request.getNome());
         utente.setCognome(request.getCognome());
         utente.setNickname(request.getNickname());
         utente.setPassword(request.getPassword());
-
         utente.setRuolo(Ruolo.valueOf(request.getRuolo().toUpperCase()));
 
         if (request.getMezzoId() != null) {
+
             Mezzo mezzo = mezzoService
                     .trovaMezzoPerId(request.getMezzoId())
-                    .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+                    .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
             utente.setMezzo(mezzo);
         }
@@ -62,42 +74,42 @@ public class UtenteController {
 
     @PutMapping("/{id}")
     public Utente modificaUtente(@PathVariable Long id, @RequestBody UtenteRequest request) {
-        Utente utente = utenteService.trovaUtentePerId(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        Utente utente = utenteService
+                .trovaUtentePerId(id)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
         utente.setNome(request.getNome());
         utente.setCognome(request.getCognome());
         utente.setNickname(request.getNickname());
-
         utente.setRuolo(Ruolo.valueOf(request.getRuolo().toUpperCase()));
 
-        if(request.getMezzoId() != null) {
-            Mezzo mezzo = mezzoService.trovaMezzoPerId(request.getMezzoId())
-                    .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+        if (request.getMezzoId() != null) {
+            Mezzo mezzo = mezzoService
+                    .trovaMezzoPerId(request.getMezzoId())
+                    .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
             utente.setMezzo(mezzo);
-        }else {
+        } else {
             utente.setMezzo(null);
         }
+
         return utenteService.modificaUtente(id, utente);
     }
 
     @PutMapping("/{id}/disattiva")
-    public ResponseEntity<Void> disattivaUtente(@PathVariable Long id) {
+    public ResponseEntity<Utente> disattivaUtente(@PathVariable Long id) {
 
-        utenteService.disattivaUtente(id);
+        Utente utente = utenteService.disattivaUtente(id);
 
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/attivi")
-    public List<Utente> getUtentiAttivi() {
-        return utenteService.trovaUtentiAttivi();
+        return ResponseEntity.ok(utente);
     }
 
     @PutMapping("/{id}/attiva")
     public ResponseEntity<Utente> attivaUtente(@PathVariable Long id) {
+
         Utente utente = utenteService.attivaUtente(id);
+
         return ResponseEntity.ok(utente);
     }
 }
