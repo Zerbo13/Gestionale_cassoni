@@ -42,13 +42,13 @@ public class CassoneService {
         return cassoneRepository.save(cassone);
     }
 
-    public void disattivaCassone(Long id) {
+    public Cassone disattivaCassone(Long id) {
 
         Cassone cassone = cassoneRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
 
         cassone.setAttivo(false);
 
-        cassoneRepository.save(cassone);
+        return cassoneRepository.save(cassone);
     }
 }

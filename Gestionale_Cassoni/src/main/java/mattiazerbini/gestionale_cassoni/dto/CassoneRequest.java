@@ -6,18 +6,25 @@ public class CassoneRequest {
     private String colore;
     private String misura;
     private String tipologia;
+    private String capacità;
     private Long posizioneInizialeId;
 
     public CassoneRequest() {
     }
 
-    public CassoneRequest(String codiceCassone, String colore,
-                          String misura, String tipologia,
-                          Long posizioneInizialeId) {
+    public CassoneRequest(
+            String codiceCassone,
+            String colore,
+            String misura,
+            String tipologia,
+            String capacità,
+            Long posizioneInizialeId
+    ) {
         this.codiceCassone = codiceCassone;
         this.colore = colore;
         this.misura = misura;
         this.tipologia = tipologia;
+        this.capacità = capacità;
         this.posizioneInizialeId = posizioneInizialeId;
     }
 
@@ -51,6 +58,14 @@ public class CassoneRequest {
 
     public void setTipologia(String tipologia) {
         this.tipologia = tipologia;
+    }
+
+    public String getCapacità() {
+        return capacità;
+    }
+
+    public void setCapacità(String capacità) {
+        this.capacità = capacità;
     }
 
     public Long getPosizioneInizialeId() {

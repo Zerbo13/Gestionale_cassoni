@@ -2,6 +2,7 @@ package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Utente;
 import mattiazerbini.gestionale_cassoni.repositories.UtenteRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,10 +12,13 @@ import java.util.Optional;
 public class UtenteService {
 
     private final UtenteRepository utenteRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UtenteService(UtenteRepository utenteRepository) {
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder passwordEncoder) {
         this.utenteRepository = utenteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
 
     public List<Utente> trovaTuttiGliUtenti() {
         return utenteRepository.findAll();
@@ -25,7 +29,9 @@ public class UtenteService {
     }
 
     public Utente salvaUtente(Utente utente) {
-        return utenteRepository.save(utente);
+
+        utente.setPassword(passwordEncoder.encode(utente.getPassword()));
+    return utenteRepository.save(utente);
     }
 
     public Utente modificaUtente(Long id, Utente utenteModificato) {
@@ -53,7 +59,19 @@ public class UtenteService {
     }
 
     public Utente trovaPerNickname(String nickname) {
-        return utenteRepository.findByNickname(nickname)
+        return utenteRepository.findByNicknameIgnoreCase(nickname)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    }
+
+    public List<Utente> trovaUtentiAttivi() {
+        return utenteRepository.findByAttivoTrue();
+    }
+
+    public Utente attivaUtente(Long id) {
+        Utente utente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        utente.setAttivo(true);
+
+        return utenteRepository.save(utente);
     }
 }

@@ -46,4 +46,19 @@ public class MezzoService {
         mezzo.setAttivo(false);
         mezzoRepository.save(mezzo);
     }
+
+    public List<Mezzo> trovaMezziAttivi() {
+        return mezzoRepository.findByAttivoTrue();
+    }
+
+
+    public Mezzo attivaMezzo(Long id) {
+
+        Mezzo mezzo = mezzoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+
+        mezzo.setAttivo(true);
+
+        return mezzoRepository.save(mezzo);
+    }
 }

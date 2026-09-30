@@ -46,4 +46,8 @@ public class LuogoService {
         luogo.setAttivo(false);
         luogoRepository.save(luogo);
     }
+
+    public List<Luogo> trovaLuoghiAttivi() {
+        return luogoRepository.findByAttivoTrue();
+    }
 }

@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import mattiazerbini.gestionale_cassoni.dto.LuogoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,28 @@ public class LuogoController {
     }
 
     @PostMapping
-    public Luogo creaLuogo(@RequestBody Luogo luogo) {
+    public Luogo creaLuogo(@RequestBody LuogoRequest request) {
+
+        Luogo luogo = new Luogo();
+
+        luogo.setNome(request.getNome());
+        luogo.setIndirizzo(request.getIndirizzo());
+        luogo.setTipologia(request.getTipologia());
+        luogo.setAttivo(true);
+
         return luogoService.salvaLuogo(luogo);
     }
 
     @PutMapping("/{id}")
-    public Luogo modificaLuogo(
-            @PathVariable Long id,
-            @RequestBody Luogo luogo
-    ) {
+    public Luogo modificaLuogo(@PathVariable Long id, @RequestBody LuogoRequest request) {
+
+        Luogo luogo = luogoService.trovaLuogoPerId(id)
+                .orElseThrow(() -> new RuntimeException("Luogo non trovato"));
+
+        luogo.setNome(request.getNome());
+        luogo.setIndirizzo(request.getIndirizzo());
+        luogo.setTipologia(request.getTipologia());
+
         return luogoService.modificaLuogo(id, luogo);
     }
 
@@ -47,5 +61,10 @@ public class LuogoController {
     public ResponseEntity<Void> disattivaLuogo(@PathVariable Long id) {
         luogoService.disattivaLuogo(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/attivi")
+    public List<Luogo> getTuttiILuoghiAttivi() {
+        return luogoService.trovaLuoghiAttivi();
     }
 }

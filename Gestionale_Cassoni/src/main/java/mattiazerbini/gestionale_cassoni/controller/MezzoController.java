@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import mattiazerbini.gestionale_cassoni.dto.MezzoRequest;
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.services.MezzoService;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,28 @@ public class MezzoController {
     }
 
     @PostMapping
-    public Mezzo creaMezzo(@RequestBody Mezzo mezzo) {
+    public Mezzo creaMezzo(@RequestBody MezzoRequest request) {
+
+        Mezzo mezzo = new Mezzo();
+
+        mezzo.setTarga(request.getTarga());
+        mezzo.setModello(request.getModello());
+        mezzo.setTipologia(request.getTipo());
+        mezzo.setAttivo(true);
+
         return mezzoService.salvaMezzo(mezzo);
     }
 
     @PutMapping("/{id}")
-    public Mezzo modificaMezzo(
-            @PathVariable Long id,
-            @RequestBody Mezzo mezzo
-    ) {
+    public Mezzo modificaMezzo(@PathVariable Long id, @RequestBody MezzoRequest request) {
+
+        Mezzo mezzo = mezzoService.trovaMezzoPerId(id)
+                .orElseThrow(() -> new RuntimeException("Mezzo non trovato"));
+
+        mezzo.setTarga(request.getTarga());
+        mezzo.setModello(request.getModello());
+        mezzo.setTipologia(request.getTipo());
+
         return mezzoService.modificaMezzo(id, mezzo);
     }
 
@@ -47,5 +61,16 @@ public class MezzoController {
     public ResponseEntity<Void> disattivaMezzo(@PathVariable Long id) {
         mezzoService.disattivaMezzo(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/attiva")
+    public ResponseEntity<Mezzo> attivaMezzo(@PathVariable Long id) {
+        Mezzo mezzo = mezzoService.attivaMezzo(id);
+        return ResponseEntity.ok(mezzo);
+    }
+
+    @GetMapping("/attivi")
+    public List<Mezzo> getMezziAttivi() {
+        return mezzoService.trovaMezziAttivi();
     }
 }
