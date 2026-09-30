@@ -3,13 +3,15 @@ package mattiazerbini.gestionale_cassoni.controller;
 import mattiazerbini.gestionale_cassoni.dto.ViaggioRequest;
 import mattiazerbini.gestionale_cassoni.dto.ViaggioResponse;
 import mattiazerbini.gestionale_cassoni.entities.*;
+import mattiazerbini.gestionale_cassoni.exceptions.BadRequestException;
+import mattiazerbini.gestionale_cassoni.exceptions.ForbiddenException;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.CassoneService;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
 import mattiazerbini.gestionale_cassoni.services.ViaggioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -22,7 +24,11 @@ public class ViaggioController {
     private final CassoneService cassoneService;
     private final LuogoService luogoService;
 
-    public ViaggioController(ViaggioService viaggioService, CassoneService cassoneService, LuogoService luogoService) {
+    public ViaggioController(
+            ViaggioService viaggioService,
+            CassoneService cassoneService,
+            LuogoService luogoService
+    ) {
         this.viaggioService = viaggioService;
         this.cassoneService = cassoneService;
         this.luogoService = luogoService;
@@ -38,7 +44,10 @@ public class ViaggioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Viaggio> getViaggioPerId(@PathVariable Long id) {
+    public ResponseEntity<Viaggio> getViaggioPerId(
+            @PathVariable Long id
+    ) {
+
         return viaggioService.trovaViaggioPerId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -50,26 +59,31 @@ public class ViaggioController {
             Authentication authentication
     ) {
 
-        Utente utente = (Utente) authentication.getPrincipal();
+        Utente utente =
+                (Utente) authentication.getPrincipal();
 
         Mezzo mezzo = utente.getMezzo();
 
         if (mezzo == null) {
-            throw new RuntimeException(
-                    "Nessun mezzo assegnato all'utente!"
+            throw new BadRequestException(
+                    "Nessun mezzo assegnato all'utente"
             );
         }
 
         Cassone cassone = cassoneService
                 .trovaCassonePerId(request.getCassoneId())
                 .orElseThrow(() ->
-                        new RuntimeException("Cassone non trovato")
+                        new NotFoundException(
+                                "Cassone non trovato"
+                        )
                 );
 
         Luogo destinazione = luogoService
                 .trovaLuogoPerId(request.getDestinazioneId())
                 .orElseThrow(() ->
-                        new RuntimeException("Destinazione non trovata")
+                        new NotFoundException(
+                                "Destinazione non trovata"
+                        )
                 );
 
         Viaggio viaggio = new Viaggio();
@@ -83,51 +97,107 @@ public class ViaggioController {
         Viaggio viaggioSalvato =
                 viaggioService.avviaViaggio(viaggio);
 
-        return viaggioService.convetiInResponse(viaggioSalvato);
+        return viaggioService.convetiInResponse(
+                viaggioSalvato
+        );
     }
 
     @PutMapping("/{id}/chiudi")
-    public ViaggioResponse chiudiViaggio(@PathVariable Long id, Authentication authentication) {
-        Utente utente = (Utente) authentication.getPrincipal();
-        Viaggio viaggio = viaggioService.trovaViaggioPerId(id)
-                .orElseThrow(()-> new RuntimeException("Viaggio non trovato"));
+    public ViaggioResponse chiudiViaggio(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
 
-        if (utente.getRuolo() != Ruolo.ADMIN && !viaggio.getUtente().getId().equals(utente.getId())) {
-            throw new RuntimeException("Non puoi chiiudere il viaggio di un altro operaio");
+        Utente utente =
+                (Utente) authentication.getPrincipal();
+
+        Viaggio viaggio = viaggioService
+                .trovaViaggioPerId(id)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
+                );
+
+        if (
+                utente.getRuolo() != Ruolo.ADMIN &&
+                        !viaggio.getUtente()
+                                .getId()
+                                .equals(utente.getId())
+        ) {
+
+            throw new ForbiddenException(
+                    "Non puoi chiudere il viaggio di un altro operaio"
+            );
         }
 
-        Viaggio viaggioChiuso = viaggioService.chiudiViaggio(id);
-        return viaggioService.convetiInResponse(viaggioChiuso);
+        Viaggio viaggioChiuso =
+                viaggioService.chiudiViaggio(id);
+
+        return viaggioService.convetiInResponse(
+                viaggioChiuso
+        );
     }
 
     @PutMapping("/{id}/annulla")
-    public ViaggioResponse annullaViaggio(@PathVariable Long id, Authentication authentication) {
-        Utente utente = (Utente) authentication.getPrincipal();
-        Viaggio viaggio = viaggioService.trovaViaggioPerId(id)
-                .orElseThrow(()-> new RuntimeException("Viaggio non trovato"));
+    public ViaggioResponse annullaViaggio(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
 
-        if (utente.getRuolo() != Ruolo.ADMIN && !viaggio.getUtente().getId().equals(utente.getId())) {
-            throw new RuntimeException("Non puoi annullare il viaggio di un altro operaio");
+        Utente utente =
+                (Utente) authentication.getPrincipal();
+
+        Viaggio viaggio = viaggioService
+                .trovaViaggioPerId(id)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
+                );
+
+        if (
+                utente.getRuolo() != Ruolo.ADMIN &&
+                        !viaggio.getUtente()
+                                .getId()
+                                .equals(utente.getId())
+        ) {
+
+            throw new ForbiddenException(
+                    "Non puoi annullare il viaggio di un altro operaio"
+            );
         }
 
-        Viaggio viaggioAnnullato = viaggioService.annullaViaggio(id);
-        return viaggioService.convetiInResponse(viaggioAnnullato);
+        Viaggio viaggioAnnullato =
+                viaggioService.annullaViaggio(id);
+
+        return viaggioService.convetiInResponse(
+                viaggioAnnullato
+        );
     }
 
     @GetMapping("/cassone/{cassoneId}")
     public List<ViaggioResponse> getViaggiPerCassone(
             @PathVariable("cassoneId") Long cassoneId
     ) {
-        return viaggioService.trovaViaggiPerCassone(cassoneId)
+
+        return viaggioService
+                .trovaViaggiPerCassone(cassoneId)
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();
     }
 
     @GetMapping("/miei")
-    public List<ViaggioResponse> getViaggiMiei(Authentication authentication) {
-        Utente utente =(Utente) authentication.getPrincipal();
-        return viaggioService.trovaViaggiPerUtente(utente.getId())
+    public List<ViaggioResponse> getViaggiMiei(
+            Authentication authentication
+    ) {
+
+        Utente utente =
+                (Utente) authentication.getPrincipal();
+
+        return viaggioService
+                .trovaViaggiPerUtente(utente.getId())
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();
@@ -135,7 +205,9 @@ public class ViaggioController {
 
     @GetMapping("/oggi")
     public List<ViaggioResponse> getViaggiPerOggi() {
-        return viaggioService.trovaViaggiDiOggi()
+
+        return viaggioService
+                .trovaViaggiDiOggi()
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();

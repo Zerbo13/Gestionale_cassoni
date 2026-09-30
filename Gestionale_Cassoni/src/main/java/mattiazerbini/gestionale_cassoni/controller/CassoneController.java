@@ -3,6 +3,7 @@ package mattiazerbini.gestionale_cassoni.controller;
 import mattiazerbini.gestionale_cassoni.dto.CassoneRequest;
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.CassoneService;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
 import mattiazerbini.gestionale_cassoni.services.ViaggioService;
@@ -23,19 +24,25 @@ public class CassoneController {
     public CassoneController(
             CassoneService cassoneService,
             ViaggioService viaggioService,
-            LuogoService luogoService) {
+            LuogoService luogoService
+    ) {
         this.cassoneService = cassoneService;
         this.viaggioService = viaggioService;
         this.luogoService = luogoService;
     }
+
     @GetMapping
     public List<Cassone> getTuttiICassoni() {
         return cassoneService.trovaTuttiICassoni();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cassone> getCassonePerId(@PathVariable Long id) {
-        return cassoneService.trovaCassonePerId(id)
+    public ResponseEntity<Cassone> getCassonePerId(
+            @PathVariable Long id
+    ) {
+
+        return cassoneService
+                .trovaCassonePerId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -44,9 +51,10 @@ public class CassoneController {
     public Cassone creaCassone(@RequestBody CassoneRequest request) {
 
         Luogo posizioneIniziale = luogoService.trovaLuogoPerId(request.getPosizioneInizialeId())
-                .orElseThrow(() -> new RuntimeException("Posizione iniziale non trovata"));
+                .orElseThrow(() -> new NotFoundException("Posizione iniziale non trovata"));
 
         Cassone cassone = new Cassone();
+
         cassone.setCodiceCassone(request.getCodiceCassone());
         cassone.setColore(request.getColore());
         cassone.setMisura(request.getMisura());
@@ -61,13 +69,12 @@ public class CassoneController {
     @PutMapping("/{id}")
     public ResponseEntity<Cassone> modificaCassone(@PathVariable Long id, @RequestBody CassoneRequest request) {
 
-        Cassone cassone = cassoneService
-                .trovaCassonePerId(id)
-                .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
+        Cassone cassone = cassoneService.trovaCassonePerId(id)
+                .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
 
         Luogo posizioneIniziale = luogoService
                 .trovaLuogoPerId(request.getPosizioneInizialeId())
-                .orElseThrow(() -> new RuntimeException("Posizione iniziale non trovata"));
+                .orElseThrow(() -> new NotFoundException("Posizione iniziale non trovata"));
 
         cassone.setCodiceCassone(request.getCodiceCassone());
         cassone.setColore(request.getColore());
@@ -77,27 +84,25 @@ public class CassoneController {
         cassone.setPosizioneIniziale(posizioneIniziale);
 
         Cassone cassoneModificato = cassoneService.modificaCassone(id, cassone);
-
         return ResponseEntity.ok(cassoneModificato);
     }
 
     @PutMapping("/{id}/disattiva")
     public ResponseEntity<Cassone> disattivaCassone(@PathVariable Long id) {
+
         Cassone cassone = cassoneService.disattivaCassone(id);
 
         return ResponseEntity.ok(cassone);
     }
 
-
     @GetMapping("/{id}/posizione")
     public ResponseEntity<String> getPosizioneAttuale(@PathVariable Long id) {
 
-        return cassoneService
+        Cassone cassone = cassoneService
                 .trovaCassonePerId(id)
-                .map(cassone -> ResponseEntity.ok(
-                                viaggioService.trovaPosizioneAttualeCassone(cassone)))
-                .orElse(ResponseEntity
-                                .notFound()
-                                .build());
+                .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
+
+        String posizione = viaggioService.trovaPosizioneAttualeCassone(cassone);
+        return ResponseEntity.ok(posizione);
     }
 }

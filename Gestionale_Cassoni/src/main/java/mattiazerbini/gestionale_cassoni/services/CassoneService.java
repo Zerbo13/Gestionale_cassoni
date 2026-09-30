@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
+import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.CassoneRepository;
 import org.springframework.stereotype.Service;
 
@@ -31,21 +32,21 @@ public class CassoneService {
     public Cassone modificaCassone(Long id, Cassone cassoneModificato) {
 
         Cassone cassone = cassoneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
+                .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
 
         cassone.setCodiceCassone(cassoneModificato.getCodiceCassone());
         cassone.setColore(cassoneModificato.getColore());
         cassone.setMisura(cassoneModificato.getMisura());
         cassone.setTipologia(cassoneModificato.getTipologia());
+        cassone.setCapacità(cassoneModificato.getCapacità());
         cassone.setPosizioneIniziale(cassoneModificato.getPosizioneIniziale());
-
         return cassoneRepository.save(cassone);
     }
 
     public Cassone disattivaCassone(Long id) {
 
         Cassone cassone = cassoneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cassone non trovato"));
+                .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
 
         cassone.setAttivo(false);
 
