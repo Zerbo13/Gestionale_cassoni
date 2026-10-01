@@ -26,7 +26,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity httpSecurity,
-            JWTCheckedFilter jwtCheckedFilter
+            JWTCheckedFilter jwtCheckedFilter,
+            RateLimitFilter rateLimitFilter
     ) throws Exception {
 
         httpSecurity.cors(Customizer.withDefaults());
@@ -168,9 +169,15 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
 
+        // RATE LIMIT
         httpSecurity.addFilterBefore(
-                jwtCheckedFilter,
+                rateLimitFilter,
                 UsernamePasswordAuthenticationFilter.class
+        );
+
+        httpSecurity.addFilterAfter(
+                jwtCheckedFilter,
+                RateLimitFilter.class
         );
 
         return httpSecurity.build();
