@@ -53,13 +53,9 @@ public class ViaggioService {
     public ViaggioResponse convetiInResponse(Viaggio viaggio) {
 
         return new ViaggioResponse(viaggio.getId(),
-                viaggio.getUtente().getNome()
-                        + " "
-                        + viaggio.getUtente().getCognome(),
+                viaggio.getUtente().getNome() + " " + viaggio.getUtente().getCognome(),
 
-                viaggio.getMezzo().getTarga()
-                        + " "
-                        + viaggio.getMezzo().getModello(),
+                viaggio.getMezzo().getTarga() + " " + viaggio.getMezzo().getModello(),
 
                 viaggio.getCassone().getCodiceCassone(),
                 viaggio.getPartenza().getNome(),
@@ -67,46 +63,47 @@ public class ViaggioService {
                 viaggio.getDataOraInizio(),
                 viaggio.getDataOraFine(),
                 viaggio.getStato(),
-                viaggio.getNote()
-        );
+                viaggio.getNote());
     }
 
     public Viaggio avviaViaggio(Viaggio viaggio) {
 
-        Cassone cassone = viaggio.getCassone();
+        boolean cassoneOccupato = viaggioRepository.existsByCassoneIdAndStato(viaggio.getCassone().getId(), StatoViaggio.IN_CORSO);
 
-        Optional<Viaggio> viaggioInCorso =
-                viaggioRepository
-                        .findFirstByCassoneIdAndStatoOrderByDataOraInizioDesc(cassone.getId(),
-                                StatoViaggio.IN_CORSO);
-
-        if (viaggioInCorso.isPresent()) {
-            throw new BadRequestException("Il cassone ha già un viaggio in corso");
+        if (cassoneOccupato) {
+            throw new BadRequestException("Il cassone è già impegnato in un viaggio");
         }
 
-        Optional<Viaggio> ultimoViaggioCompletato =
-                viaggioRepository
-                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(cassone.getId(),
-                                StatoViaggio.COMPLETATO);
+        boolean mezzoOccupato = viaggioRepository.existsByMezzoIdAndStato(viaggio.getMezzo().getId(), StatoViaggio.IN_CORSO);
+
+        if (mezzoOccupato) {
+            throw new BadRequestException("Il mezzo è già impegnato in un viaggio");
+        }
+
+        boolean autistaOccupato = viaggioRepository.existsByUtenteIdAndStato(viaggio.getUtente().getId(), StatoViaggio.IN_CORSO);
+
+        if (autistaOccupato) {
+            throw new BadRequestException("Hai già un viaggio in corso");
+        }
+
+        Optional<Viaggio> ultimoViaggioCompletato = viaggioRepository
+                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(viaggio.getCassone().getId(), StatoViaggio.COMPLETATO);
 
         if (ultimoViaggioCompletato.isPresent()) {
 
-            viaggio.setPartenza(ultimoViaggioCompletato
-                            .get()
+            viaggio.setPartenza(ultimoViaggioCompletato.get()
                             .getDestinazione());
 
         } else {
 
-            if (cassone.getPosizioneIniziale() == null) {
+            if (viaggio.getCassone().getPosizioneIniziale() == null) {
                 throw new BadRequestException("Il cassone non ha una posizione iniziale");
             }
 
-            viaggio.setPartenza(cassone.getPosizioneIniziale());
+            viaggio.setPartenza(viaggio.getCassone().getPosizioneIniziale());
         }
 
         viaggio.setDataOraInizio(LocalDateTime.now());
-
-        viaggio.setDataOraFine(null);
 
         viaggio.setStato(StatoViaggio.IN_CORSO);
 

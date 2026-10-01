@@ -4,4 +4,8 @@ import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CassoneRepository extends JpaRepository<Cassone, Long> {
+
+    boolean existsByCodiceCassoneIgnoreCase(String codiceCassone);
+
+    boolean existsByCodiceCassoneIgnoreCaseAndIdNot(String codiceCassone, Long id);
 }

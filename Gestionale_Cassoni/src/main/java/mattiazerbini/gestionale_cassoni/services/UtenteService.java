@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Utente;
+import mattiazerbini.gestionale_cassoni.exceptions.ConflictException;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.UtenteRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,11 @@ public class UtenteService {
 
     public Utente salvaUtente(Utente utente) {
         utente.setPassword(passwordEncoder.encode(utente.getPassword()));
+        if (utenteRepository.existsByNicknameIgnoreCase(utente.getNickname())) {
+            throw new ConflictException("Nickname già in utilizzo!");
+        }
 
+        utente.setPassword(passwordEncoder.encode(utente.getPassword()));
         return utenteRepository.save(utente);
     }
 
@@ -38,6 +43,10 @@ public class UtenteService {
 
         Utente utente = utenteRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Utente non trovato"));
+
+        if (utenteRepository.existsByNicknameIgnoreCaseAndIdNot(utente.getNickname(), id)) {
+            throw new ConflictException("Nickname già in utilizzo!");
+        }
 
         utente.setNome(utenteModificato.getNome());
         utente.setCognome(utenteModificato.getCognome());

@@ -1,8 +1,13 @@
 package mattiazerbini.gestionale_cassoni.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequest {
 
+    @NotBlank(message = "Il nickname è obbligatorio")
     private String nickname;
+
+    @NotBlank(message = "La password è obbligatoria")
     private String password;
 
     public LoginRequest() {

@@ -24,8 +24,11 @@ public interface ViaggioRepository extends JpaRepository<Viaggio, Long> {
 
     List<Viaggio> findByUtenteIdOrderByDataOraInizioDesc(Long utenteId);
 
-    List<Viaggio> findByDataOraInizioBetweenOrderByDataOraInizioDesc(
-            LocalDateTime inizio,
-            LocalDateTime fine
-    );
+    List<Viaggio> findByDataOraInizioBetweenOrderByDataOraInizioDesc(LocalDateTime inizio, LocalDateTime fine);
+
+    boolean existsByCassoneIdAndStato(Long cassoneId, StatoViaggio stato);
+
+    boolean existsByMezzoIdAndStato(Long mezzoId, StatoViaggio stato);
+
+    boolean existsByUtenteIdAndStato(Long utenteId, StatoViaggio stato);
 }

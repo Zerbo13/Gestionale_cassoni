@@ -1,8 +1,11 @@
 package mattiazerbini.gestionale_cassoni.controller;
 
+import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.LoginRequest;
 import mattiazerbini.gestionale_cassoni.dto.LoginResponse;
 import mattiazerbini.gestionale_cassoni.entities.Utente;
+import mattiazerbini.gestionale_cassoni.exceptions.BadRequestException;
+import mattiazerbini.gestionale_cassoni.exceptions.ForbiddenException;
 import mattiazerbini.gestionale_cassoni.security.JWTTools;
 import mattiazerbini.gestionale_cassoni.services.UtenteService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,21 +31,27 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+    public LoginResponse login(
+            @Valid @RequestBody LoginRequest loginRequest
+    ) {
 
         Utente utente = utenteService.trovaPerNickname(
                 loginRequest.getNickname()
         );
 
         if (!utente.getAttivo()) {
-            throw new RuntimeException("Utente disattivato");
+            throw new ForbiddenException(
+                    "Utente disattivato"
+            );
         }
 
         if (!passwordEncoder.matches(
                 loginRequest.getPassword(),
                 utente.getPassword()
         )) {
-            throw new RuntimeException("Password non corretta");
+            throw new BadRequestException(
+                    "Password non corretta"
+            );
         }
 
         String token = jwtTools.generateToken(utente);

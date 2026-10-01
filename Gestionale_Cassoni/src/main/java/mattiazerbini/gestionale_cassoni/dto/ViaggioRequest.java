@@ -5,25 +5,39 @@ import jakarta.validation.constraints.Size;
 
 public class ViaggioRequest {
 
+    @NotNull(message = "Il mezzo è obbligatorio")
+    private Long mezzoId;
+
     @NotNull(message = "Il cassone è obbligatorio")
     private Long cassoneId;
 
     @NotNull(message = "La destinazione è obbligatoria")
     private Long destinazioneId;
 
-    @Size(
-            max = 200,
-            message = "Le note non possono superare 200 caratteri"
-    )
+    @Size(max = 500, message = "Le note non possono superare 500 caratteri")
     private String note;
 
     public ViaggioRequest() {
     }
 
-    public ViaggioRequest(Long cassoneId, Long destinazioneId, String note) {
+    public ViaggioRequest(
+            Long mezzoId,
+            Long cassoneId,
+            Long destinazioneId,
+            String note
+    ) {
+        this.mezzoId = mezzoId;
         this.cassoneId = cassoneId;
         this.destinazioneId = destinazioneId;
         this.note = note;
+    }
+
+    public Long getMezzoId() {
+        return mezzoId;
+    }
+
+    public void setMezzoId(Long mezzoId) {
+        this.mezzoId = mezzoId;
     }
 
     public Long getCassoneId() {

@@ -13,4 +13,8 @@ public interface UtenteRepository extends JpaRepository<Utente, Long> {
     boolean existsByNickname(String nickname);
 
     List<Utente> findByAttivoTrue();
+
+    boolean existsByNicknameIgnoreCase(String nickname);
+
+    boolean existsByNicknameIgnoreCaseAndIdNot(String nickname, Long id);
 }

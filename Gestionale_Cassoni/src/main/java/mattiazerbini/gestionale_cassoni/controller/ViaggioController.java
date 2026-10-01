@@ -3,12 +3,18 @@ package mattiazerbini.gestionale_cassoni.controller;
 import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.ViaggioRequest;
 import mattiazerbini.gestionale_cassoni.dto.ViaggioResponse;
-import mattiazerbini.gestionale_cassoni.entities.*;
+import mattiazerbini.gestionale_cassoni.entities.Cassone;
+import mattiazerbini.gestionale_cassoni.entities.Luogo;
+import mattiazerbini.gestionale_cassoni.entities.Mezzo;
+import mattiazerbini.gestionale_cassoni.entities.Ruolo;
+import mattiazerbini.gestionale_cassoni.entities.Utente;
+import mattiazerbini.gestionale_cassoni.entities.Viaggio;
 import mattiazerbini.gestionale_cassoni.exceptions.BadRequestException;
 import mattiazerbini.gestionale_cassoni.exceptions.ForbiddenException;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.services.CassoneService;
 import mattiazerbini.gestionale_cassoni.services.LuogoService;
+import mattiazerbini.gestionale_cassoni.services.MezzoService;
 import mattiazerbini.gestionale_cassoni.services.ViaggioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,21 +30,25 @@ public class ViaggioController {
     private final ViaggioService viaggioService;
     private final CassoneService cassoneService;
     private final LuogoService luogoService;
+    private final MezzoService mezzoService;
 
     public ViaggioController(
             ViaggioService viaggioService,
             CassoneService cassoneService,
-            LuogoService luogoService
+            LuogoService luogoService,
+            MezzoService mezzoService
     ) {
         this.viaggioService = viaggioService;
         this.cassoneService = cassoneService;
         this.luogoService = luogoService;
+        this.mezzoService = mezzoService;
     }
 
     @GetMapping
     public List<ViaggioResponse> getTuttiIViaggi() {
 
-        return viaggioService.trovaTuttiIViaggi()
+        return viaggioService
+                .trovaTuttiIViaggi()
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();
@@ -59,19 +69,29 @@ public class ViaggioController {
 
         Utente utente = (Utente) authentication.getPrincipal();
 
-        Mezzo mezzo = utente.getMezzo();
+        Mezzo mezzo = mezzoService
+                .trovaMezzoPerId(request.getMezzoId())
+                .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
 
-        if (mezzo == null) {
-            throw new BadRequestException("Nessun mezzo assegnato all'utente");
+        if (!mezzo.getAttivo()) {
+            throw new BadRequestException("Il mezzo selezionato è disattivato");
         }
 
         Cassone cassone = cassoneService
                 .trovaCassonePerId(request.getCassoneId())
                 .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
 
+        if (!cassone.getAttivo()) {
+            throw new BadRequestException("Il cassone è disattivato");
+        }
+
         Luogo destinazione = luogoService
                 .trovaLuogoPerId(request.getDestinazioneId())
                 .orElseThrow(() -> new NotFoundException("Destinazione non trovata"));
+
+        if (!destinazione.getAttivo()) {
+            throw new BadRequestException("La destinazione è disattivata");
+        }
 
         Viaggio viaggio = new Viaggio();
 
@@ -109,7 +129,8 @@ public class ViaggioController {
 
         Utente utente = (Utente) authentication.getPrincipal();
 
-        Viaggio viaggio = viaggioService.trovaViaggioPerId(id)
+        Viaggio viaggio = viaggioService
+                .trovaViaggioPerId(id)
                 .orElseThrow(() -> new NotFoundException("Viaggio non trovato"));
 
         if (utente.getRuolo() != Ruolo.ADMIN && !viaggio.getUtente().getId().equals(utente.getId())) {
@@ -122,7 +143,9 @@ public class ViaggioController {
     }
 
     @GetMapping("/cassone/{cassoneId}")
-    public List<ViaggioResponse> getViaggiPerCassone(@PathVariable Long cassoneId) {
+    public List<ViaggioResponse> getViaggiPerCassone(
+            @PathVariable Long cassoneId
+    ) {
 
         return viaggioService
                 .trovaViaggiPerCassone(cassoneId)
@@ -136,7 +159,8 @@ public class ViaggioController {
 
         Utente utente = (Utente) authentication.getPrincipal();
 
-        return viaggioService.trovaViaggiPerUtente(utente.getId())
+        return viaggioService
+                .trovaViaggiPerUtente(utente.getId())
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();
@@ -145,7 +169,8 @@ public class ViaggioController {
     @GetMapping("/oggi")
     public List<ViaggioResponse> getViaggiPerOggi() {
 
-        return viaggioService.trovaViaggiDiOggi()
+        return viaggioService
+                .trovaViaggiDiOggi()
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();

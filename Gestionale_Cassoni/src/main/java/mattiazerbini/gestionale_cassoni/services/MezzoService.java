@@ -1,6 +1,7 @@
 package mattiazerbini.gestionale_cassoni.services;
 
 import mattiazerbini.gestionale_cassoni.entities.Mezzo;
+import mattiazerbini.gestionale_cassoni.exceptions.ConflictException;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.MezzoRepository;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ public class MezzoService {
     }
 
     public Mezzo salvaMezzo(Mezzo mezzo) {
+
+        if (mezzoRepository.existsByTargaIgnoreCase(mezzo.getTarga())) {
+            throw new ConflictException("Targa già in uso su un altro mezzo!");
+        }
         return mezzoRepository.save(mezzo);
     }
 
@@ -33,6 +38,10 @@ public class MezzoService {
 
         Mezzo mezzo = mezzoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Mezzo non trovato"));
+
+        if (mezzoRepository.existsByTargaIgnoreCaseAndIdNot(mezzo.getTarga(), id)) {
+            throw new ConflictException("Targa già in utilizzo su un altro mezzo!!");
+        }
 
         mezzo.setTarga(mezzoModificato.getTarga());
         mezzo.setModello(mezzoModificato.getModello());
