@@ -2,6 +2,7 @@ package mattiazerbini.gestionale_cassoni.controller;
 
 import jakarta.validation.Valid;
 import mattiazerbini.gestionale_cassoni.dto.CassoneRequest;
+import mattiazerbini.gestionale_cassoni.dto.PosizioneCassoneResponse;
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
@@ -11,6 +12,7 @@ import mattiazerbini.gestionale_cassoni.services.ViaggioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -62,6 +64,7 @@ public class CassoneController {
         cassone.setTipologia(request.getTipologia());
         cassone.setCapacità(request.getCapacità());
         cassone.setPosizioneIniziale(posizioneIniziale);
+        cassone.setDataPosizioneIniziale(LocalDateTime.now());
         cassone.setAttivo(true);
 
         return cassoneService.salvaCassone(cassone);
@@ -97,13 +100,15 @@ public class CassoneController {
     }
 
     @GetMapping("/{id}/posizione")
-    public ResponseEntity<String> getPosizioneAttuale(@PathVariable Long id) {
+    public ResponseEntity<PosizioneCassoneResponse> getPosizioneAttuale(@PathVariable Long id) {
 
         Cassone cassone = cassoneService
                 .trovaCassonePerId(id)
                 .orElseThrow(() -> new NotFoundException("Cassone non trovato"));
 
-        String posizione = viaggioService.trovaPosizioneAttualeCassone(cassone);
+        PosizioneCassoneResponse posizione =
+                viaggioService.trovaPosizioneAttualeCassone(cassone);
+
         return ResponseEntity.ok(posizione);
     }
 }

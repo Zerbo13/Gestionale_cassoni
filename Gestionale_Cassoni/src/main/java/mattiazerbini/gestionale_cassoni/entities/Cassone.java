@@ -2,6 +2,8 @@ package mattiazerbini.gestionale_cassoni.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "Cassoni")
 public class Cassone {
@@ -23,11 +25,13 @@ public class Cassone {
 
     private Boolean attivo=true;
 
+    private LocalDateTime dataPosizioneIniziale;
+
     @ManyToOne
     @JoinColumn(name = "posizione_iniziale_id")
     private Luogo posizioneIniziale;
 
-    public Cassone(String codice_cassone, String tipologia, String colore, String misura, Boolean attivo, String capacità, Luogo posizione_iniziale_id) {
+    public Cassone(String codice_cassone, String tipologia, String colore, String misura, Boolean attivo, String capacità, Luogo posizione_iniziale_id, LocalDateTime dataPosizioneIniziale) {
         this.codice_cassone = codice_cassone;
         this.tipologia = tipologia;
         this.colore = colore;
@@ -35,6 +39,7 @@ public class Cassone {
         this.attivo = attivo;
         this.capacità = capacità;
         this.posizioneIniziale = posizioneIniziale;
+        this.dataPosizioneIniziale = dataPosizioneIniziale;
     }
 
     public Cassone(){
@@ -102,5 +107,13 @@ public class Cassone {
 
     public void setPosizioneIniziale(Luogo posizioneIniziale) {
         this.posizioneIniziale = posizioneIniziale;
+    }
+
+    public LocalDateTime getDataPosizioneIniziale() {
+        return dataPosizioneIniziale;
+    }
+
+    public void setDataPosizioneIniziale(LocalDateTime dataPosizioneIniziale) {
+        this.dataPosizioneIniziale = dataPosizioneIniziale;
     }
 }

@@ -1,5 +1,6 @@
 package mattiazerbini.gestionale_cassoni.services;
 
+import mattiazerbini.gestionale_cassoni.dto.PosizioneCassoneResponse;
 import mattiazerbini.gestionale_cassoni.dto.ViaggioResponse;
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.StatoViaggio;
@@ -9,6 +10,7 @@ import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
 import mattiazerbini.gestionale_cassoni.repositories.ViaggioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,11 +30,13 @@ public class ViaggioService {
     }
 
     public List<Viaggio> trovaViaggiPerCassone(Long cassoneId) {
-        return viaggioRepository.findByCassoneIdOrderByDataOraInizioDesc(cassoneId);
+        return viaggioRepository
+                .findByCassoneIdOrderByDataOraInizioDesc(cassoneId);
     }
 
     public List<Viaggio> trovaViaggiPerUtente(Long utenteId) {
-        return viaggioRepository.findByUtenteIdOrderByDataOraInizioDesc(utenteId);
+        return viaggioRepository
+                .findByUtenteIdOrderByDataOraInizioDesc(utenteId);
     }
 
     public Optional<Viaggio> trovaViaggioPerId(Long id) {
@@ -41,71 +45,125 @@ public class ViaggioService {
 
     public List<Viaggio> trovaViaggiDiOggi() {
 
-        LocalDateTime dataInizio = LocalDate.now().atStartOfDay();
-        LocalDateTime dataFine = LocalDate.now()
-                .plusDays(1)
-                .atStartOfDay();
+        LocalDateTime dataInizio =
+                LocalDate.now().atStartOfDay();
+
+        LocalDateTime dataFine =
+                LocalDate.now()
+                        .plusDays(1)
+                        .atStartOfDay();
 
         return viaggioRepository
-                .findByDataOraInizioBetweenOrderByDataOraInizioDesc(dataInizio, dataFine);
+                .findByDataOraInizioBetweenOrderByDataOraInizioDesc(
+                        dataInizio,
+                        dataFine
+                );
     }
 
     public ViaggioResponse convetiInResponse(Viaggio viaggio) {
 
-        return new ViaggioResponse(viaggio.getId(),
-                viaggio.getUtente().getNome() + " " + viaggio.getUtente().getCognome(),
+        return new ViaggioResponse(
+                viaggio.getId(),
 
-                viaggio.getMezzo().getTarga() + " " + viaggio.getMezzo().getModello(),
+                viaggio.getUtente().getNome()
+                        + " "
+                        + viaggio.getUtente().getCognome(),
+
+                viaggio.getMezzo().getTarga()
+                        + " "
+                        + viaggio.getMezzo().getModello(),
 
                 viaggio.getCassone().getCodiceCassone(),
+
                 viaggio.getPartenza().getNome(),
+
                 viaggio.getDestinazione().getNome(),
+
                 viaggio.getDataOraInizio(),
+
                 viaggio.getDataOraFine(),
+
                 viaggio.getStato(),
-                viaggio.getNote());
+
+                viaggio.getNote()
+        );
     }
 
     public Viaggio avviaViaggio(Viaggio viaggio) {
 
-        boolean cassoneOccupato = viaggioRepository.existsByCassoneIdAndStato(viaggio.getCassone().getId(), StatoViaggio.IN_CORSO);
+        boolean cassoneOccupato =
+                viaggioRepository.existsByCassoneIdAndStato(
+                        viaggio.getCassone().getId(),
+                        StatoViaggio.IN_CORSO
+                );
 
         if (cassoneOccupato) {
-            throw new BadRequestException("Il cassone è già impegnato in un viaggio");
+            throw new BadRequestException(
+                    "Il cassone è già impegnato in un viaggio"
+            );
         }
 
-        boolean mezzoOccupato = viaggioRepository.existsByMezzoIdAndStato(viaggio.getMezzo().getId(), StatoViaggio.IN_CORSO);
+        boolean mezzoOccupato =
+                viaggioRepository.existsByMezzoIdAndStato(
+                        viaggio.getMezzo().getId(),
+                        StatoViaggio.IN_CORSO
+                );
 
         if (mezzoOccupato) {
-            throw new BadRequestException("Il mezzo è già impegnato in un viaggio");
+            throw new BadRequestException(
+                    "Il mezzo è già impegnato in un viaggio"
+            );
         }
 
-        boolean autistaOccupato = viaggioRepository.existsByUtenteIdAndStato(viaggio.getUtente().getId(), StatoViaggio.IN_CORSO);
+        boolean autistaOccupato =
+                viaggioRepository.existsByUtenteIdAndStato(
+                        viaggio.getUtente().getId(),
+                        StatoViaggio.IN_CORSO
+                );
 
         if (autistaOccupato) {
-            throw new BadRequestException("Hai già un viaggio in corso");
+            throw new BadRequestException(
+                    "Hai già un viaggio in corso"
+            );
         }
 
-        Optional<Viaggio> ultimoViaggioCompletato = viaggioRepository
-                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(viaggio.getCassone().getId(), StatoViaggio.COMPLETATO);
+        Optional<Viaggio> ultimoViaggioCompletato =
+                viaggioRepository
+                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(
+                                viaggio.getCassone().getId(),
+                                StatoViaggio.COMPLETATO
+                        );
 
         if (ultimoViaggioCompletato.isPresent()) {
 
-            viaggio.setPartenza(ultimoViaggioCompletato.get()
-                            .getDestinazione());
+            viaggio.setPartenza(
+                    ultimoViaggioCompletato
+                            .get()
+                            .getDestinazione()
+            );
 
         } else {
 
             if (viaggio.getCassone().getPosizioneIniziale() == null) {
-                throw new BadRequestException("Il cassone non ha una posizione iniziale");
+
+                throw new BadRequestException(
+                        "Il cassone non ha una posizione iniziale"
+                );
             }
 
-            viaggio.setPartenza(viaggio.getCassone().getPosizioneIniziale());
+            viaggio.setPartenza(
+                    viaggio.getCassone()
+                            .getPosizioneIniziale()
+            );
         }
 
-        viaggio.setDataOraInizio(LocalDateTime.now());
+        viaggio.setDataOraInizio(
+                LocalDateTime.now()
+        );
 
-        viaggio.setStato(StatoViaggio.IN_CORSO);
+        viaggio.setStato(
+                StatoViaggio.IN_CORSO
+        );
 
         return viaggioRepository.save(viaggio);
     }
@@ -132,8 +190,7 @@ public class ViaggioService {
 
         Viaggio viaggio = viaggioRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Viaggio non trovato")
-                );
+                .orElseThrow(() -> new NotFoundException("Viaggio non trovato"));
 
         if (viaggio.getStato() != StatoViaggio.IN_CORSO) {
 
@@ -147,44 +204,83 @@ public class ViaggioService {
         return viaggioRepository.save(viaggio);
     }
 
-    public String trovaPosizioneAttualeCassone(
-            Cassone cassone
+    private long calcolaGiorniFermo(
+            LocalDateTime dataArrivo
     ) {
 
-        Optional<Viaggio> viaggioInCorso =
-                viaggioRepository
-                        .findFirstByCassoneIdAndStatoOrderByDataOraInizioDesc(cassone.getId(),
-                                StatoViaggio.IN_CORSO);
+        LocalDate dataInizio = dataArrivo.toLocalDate();
+
+        LocalDate oggi = LocalDate.now();
+
+        long giorni = 0;
+
+        LocalDate data = dataInizio.plusDays(1);
+
+        while (!data.isAfter(oggi)) {
+
+            if (data.getDayOfWeek() != DayOfWeek.SUNDAY) {
+
+                giorni++;
+            }
+
+            data = data.plusDays(1);
+        }
+
+        return giorni;
+    }
+
+    public PosizioneCassoneResponse trovaPosizioneAttualeCassone(Cassone cassone) {
+
+        Optional<Viaggio> viaggioInCorso = viaggioRepository
+                        .findFirstByCassoneIdAndStatoOrderByDataOraInizioDesc(
+                                cassone.getId(), StatoViaggio.IN_CORSO);
 
         if (viaggioInCorso.isPresent()) {
 
-            return "In viaggio verso "
-                    + viaggioInCorso
-                    .get()
-                    .getDestinazione()
-                    .getNome();
+            return new PosizioneCassoneResponse(cassone.getCodiceCassone(),
+
+                    "In viaggio verso " + viaggioInCorso
+                            .get()
+                            .getDestinazione()
+                            .getNome(),
+                    0);
         }
 
-        Optional<Viaggio> ultimoViaggioCompletato =
-                viaggioRepository
-                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(cassone.getId(),
+        Optional<Viaggio> ultimoViaggioCompletato = viaggioRepository
+                        .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(
+                                cassone.getId(),
                                 StatoViaggio.COMPLETATO);
 
         if (ultimoViaggioCompletato.isPresent()) {
 
-            return ultimoViaggioCompletato
-                    .get()
-                    .getDestinazione()
-                    .getNome();
+            Viaggio ultimoViaggio = ultimoViaggioCompletato.get();
+
+            long giorniFermo = calcolaGiorniFermo(ultimoViaggio.getDataOraFine());
+
+            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), ultimoViaggio
+                            .getDestinazione()
+                            .getNome(),
+                    giorniFermo);
+        }
+
+        if (cassone.getPosizioneIniziale() != null &&
+            cassone.getDataPosizioneIniziale() != null) {
+
+            long giorniFermo = calcolaGiorniFermo(cassone.getDataPosizioneIniziale());
+
+            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), cassone
+                            .getPosizioneIniziale()
+                            .getNome(),
+                    giorniFermo);
         }
 
         if (cassone.getPosizioneIniziale() != null) {
 
-            return cassone
-                    .getPosizioneIniziale()
-                    .getNome();
+            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), cassone
+                            .getPosizioneIniziale()
+                            .getNome(), 0);
         }
 
-        return "Posizione non disponibile";
+        return new PosizioneCassoneResponse(cassone.getCodiceCassone(), "Posizione non disponibile", 0);
     }
 }
