@@ -12,8 +12,12 @@ public class Cassone {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String codice_cassone;
+    @Column(
+            name = "codice_cassone",
+            nullable = false,
+            unique = true
+    )
+    private String codiceCassone;
 
     private String tipologia;
 
@@ -23,7 +27,7 @@ public class Cassone {
 
     private String capacità;
 
-    private Boolean attivo=true;
+    private Boolean attivo = true;
 
     private LocalDateTime dataPosizioneIniziale;
 
@@ -31,8 +35,20 @@ public class Cassone {
     @JoinColumn(name = "posizione_iniziale_id")
     private Luogo posizioneIniziale;
 
-    public Cassone(String codice_cassone, String tipologia, String colore, String misura, Boolean attivo, String capacità, Luogo posizione_iniziale_id, LocalDateTime dataPosizioneIniziale) {
-        this.codice_cassone = codice_cassone;
+    public Cassone() {
+    }
+
+    public Cassone(
+            String codiceCassone,
+            String tipologia,
+            String colore,
+            String misura,
+            Boolean attivo,
+            String capacità,
+            Luogo posizioneIniziale,
+            LocalDateTime dataPosizioneIniziale
+    ) {
+        this.codiceCassone = codiceCassone;
         this.tipologia = tipologia;
         this.colore = colore;
         this.misura = misura;
@@ -40,9 +56,6 @@ public class Cassone {
         this.capacità = capacità;
         this.posizioneIniziale = posizioneIniziale;
         this.dataPosizioneIniziale = dataPosizioneIniziale;
-    }
-
-    public Cassone(){
     }
 
     public Long getId() {
@@ -54,11 +67,11 @@ public class Cassone {
     }
 
     public String getCodiceCassone() {
-        return codice_cassone;
+        return codiceCassone;
     }
 
-    public void setCodiceCassone(String codice_cassone) {
-        this.codice_cassone = codice_cassone;
+    public void setCodiceCassone(String codiceCassone) {
+        this.codiceCassone = codiceCassone;
     }
 
     public String getTipologia() {
@@ -113,7 +126,9 @@ public class Cassone {
         return dataPosizioneIniziale;
     }
 
-    public void setDataPosizioneIniziale(LocalDateTime dataPosizioneIniziale) {
+    public void setDataPosizioneIniziale(
+            LocalDateTime dataPosizioneIniziale
+    ) {
         this.dataPosizioneIniziale = dataPosizioneIniziale;
     }
 }
