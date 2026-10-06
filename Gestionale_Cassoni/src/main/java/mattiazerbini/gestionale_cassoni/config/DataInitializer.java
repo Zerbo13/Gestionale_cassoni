@@ -50,12 +50,12 @@ public class DataInitializer {
 
                 Mezzo mezzo1 = new Mezzo();
                 mezzo1.setTarga("AB123CD");
-                mezzo1.setTipo("Scarrabile");
+                mezzo1.setTipologia("Scarrabile");
                 mezzo1.setAttivo(true);
 
                 Mezzo mezzo2 = new Mezzo();
                 mezzo2.setTarga("EF456GH");
-                mezzo2.setTipo("Scarrabile");
+                mezzo2.setTipologia("Scarrabile");
                 mezzo2.setAttivo(true);
 
                 mezzoRepository.save(mezzo1);
