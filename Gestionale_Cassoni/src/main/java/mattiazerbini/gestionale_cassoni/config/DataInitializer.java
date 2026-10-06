@@ -1,72 +1,91 @@
 package mattiazerbini.gestionale_cassoni.config;
 
-import mattiazerbini.gestionale_cassoni.entities.Ruolo;
-import mattiazerbini.gestionale_cassoni.entities.Utente;
-import mattiazerbini.gestionale_cassoni.repositories.UtenteRepository;
+import mattiazerbini.gestionale_cassoni.entities.Cassone;
+import mattiazerbini.gestionale_cassoni.entities.Luogo;
+import mattiazerbini.gestionale_cassoni.entities.Mezzo;
+import mattiazerbini.gestionale_cassoni.repositories.CassoneRepository;
+import mattiazerbini.gestionale_cassoni.repositories.LuogoRepository;
+import mattiazerbini.gestionale_cassoni.repositories.MezzoRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer {
 
-    private final UtenteRepository utenteRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    public DataInitializer(
-            UtenteRepository utenteRepository,
-            PasswordEncoder passwordEncoder
+    @Bean
+    CommandLineRunner initData(
+            LuogoRepository luogoRepository,
+            MezzoRepository mezzoRepository,
+            CassoneRepository cassoneRepository
     ) {
-        this.utenteRepository = utenteRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+        return args -> {
 
-    @Override
-    public void run(String... args) {
+            if (luogoRepository.count() == 0) {
 
-        // ADMIN
-        if (!utenteRepository.existsByNickname("Admin")) {
+                Luogo deposito = new Luogo();
+                deposito.setNome("Deposito MC Trasporti");
+                deposito.setIndirizzo("Via Roma 1");
+                deposito.setTipologia("DEPOSITO");
+                deposito.setAttivo(true);
 
-            Utente admin = new Utente();
+                Luogo cantiere1 = new Luogo();
+                cantiere1.setNome("Cantiere Roma");
+                cantiere1.setIndirizzo("Via Appia 120");
+                cantiere1.setTipologia("CANTIERE");
+                cantiere1.setAttivo(true);
 
-            admin.setNome("Admin");
-            admin.setCognome("Sistema");
-            admin.setNickname("Admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
-            admin.setRuolo(Ruolo.ADMIN);
-            admin.setAttivo(true);
+                Luogo impianto1 = new Luogo();
+                impianto1.setNome("Impianto Colleferro");
+                impianto1.setIndirizzo("Via Casilina 45");
+                impianto1.setTipologia("IMPIANTO");
+                impianto1.setAttivo(true);
 
-            utenteRepository.save(admin);
-        }
+                luogoRepository.save(deposito);
+                luogoRepository.save(cantiere1);
+                luogoRepository.save(impianto1);
+            }
 
-        // OPERAIO 1
-        if (!utenteRepository.existsByNickname("Mario Rossi")) {
+            if (mezzoRepository.count() == 0) {
 
-            Utente mario = new Utente();
+                Mezzo mezzo1 = new Mezzo();
+                mezzo1.setTarga("AB123CD");
+                mezzo1.setTipo("Scarrabile");
+                mezzo1.setAttivo(true);
 
-            mario.setNome("Mario");
-            mario.setCognome("Rossi");
-            mario.setNickname("Mario Rossi");
-            mario.setPassword(passwordEncoder.encode("mario123"));
-            mario.setRuolo(Ruolo.OPERAIO);
-            mario.setAttivo(true);
+                Mezzo mezzo2 = new Mezzo();
+                mezzo2.setTarga("EF456GH");
+                mezzo2.setTipo("Scarrabile");
+                mezzo2.setAttivo(true);
 
-            utenteRepository.save(mario);
-        }
+                mezzoRepository.save(mezzo1);
+                mezzoRepository.save(mezzo2);
+            }
 
-        // OPERAIO 2
-        if (!utenteRepository.existsByNickname("Luca Bianchi")) {
+            if (cassoneRepository.count() == 0) {
 
-            Utente luca = new Utente();
+                Cassone cassone1 = new Cassone();
+                cassone1.setCodiceCassone("CAS-001");
+                cassone1.setColore("Blu");
+                cassone1.setTipologia("Aperto");
+                cassone1.setAttivo(true);
 
-            luca.setNome("Luca");
-            luca.setCognome("Bianchi");
-            luca.setNickname("Luca Bianchi");
-            luca.setPassword(passwordEncoder.encode("luca123"));
-            luca.setRuolo(Ruolo.OPERAIO);
-            luca.setAttivo(true);
+                Cassone cassone2 = new Cassone();
+                cassone2.setCodiceCassone("CAS-002");
+                cassone2.setColore("Rosso");
+                cassone2.setTipologia("Aperto");
+                cassone2.setAttivo(true);
 
-            utenteRepository.save(luca);
-        }
+                Cassone cassone3 = new Cassone();
+                cassone3.setCodiceCassone("CAS-003");
+                cassone3.setColore("Verde");
+                cassone3.setTipologia("Chiuso");
+                cassone3.setAttivo(true);
+
+                cassoneRepository.save(cassone1);
+                cassoneRepository.save(cassone2);
+                cassoneRepository.save(cassone3);
+            }
+        };
     }
 }
