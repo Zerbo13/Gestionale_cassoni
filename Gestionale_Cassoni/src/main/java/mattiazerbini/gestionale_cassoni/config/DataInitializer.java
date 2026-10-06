@@ -2,13 +2,13 @@ package mattiazerbini.gestionale_cassoni.config;
 
 import mattiazerbini.gestionale_cassoni.entities.Cassone;
 import mattiazerbini.gestionale_cassoni.entities.Luogo;
-import mattiazerbini.gestionale_cassoni.entities.Mezzo;
 import mattiazerbini.gestionale_cassoni.repositories.CassoneRepository;
 import mattiazerbini.gestionale_cassoni.repositories.LuogoRepository;
-import mattiazerbini.gestionale_cassoni.repositories.MezzoRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDateTime;
 
 @Configuration
 public class DataInitializer {
@@ -16,71 +16,74 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initData(
             LuogoRepository luogoRepository,
-            MezzoRepository mezzoRepository,
             CassoneRepository cassoneRepository
     ) {
         return args -> {
 
+            Luogo deposito;
+
             if (luogoRepository.count() == 0) {
 
-                Luogo deposito = new Luogo();
+                deposito = new Luogo();
                 deposito.setNome("Deposito MC Trasporti");
                 deposito.setIndirizzo("Via Roma 1");
                 deposito.setTipologia("DEPOSITO");
                 deposito.setAttivo(true);
 
-                Luogo cantiere1 = new Luogo();
-                cantiere1.setNome("Cantiere Roma");
-                cantiere1.setIndirizzo("Via Appia 120");
-                cantiere1.setTipologia("CANTIERE");
-                cantiere1.setAttivo(true);
+                Luogo cantiere = new Luogo();
+                cantiere.setNome("Cantiere Roma");
+                cantiere.setIndirizzo("Via Appia 120");
+                cantiere.setTipologia("CANTIERE");
+                cantiere.setAttivo(true);
 
-                Luogo impianto1 = new Luogo();
-                impianto1.setNome("Impianto Colleferro");
-                impianto1.setIndirizzo("Via Casilina 45");
-                impianto1.setTipologia("IMPIANTO");
-                impianto1.setAttivo(true);
+                Luogo impianto = new Luogo();
+                impianto.setNome("Impianto Colleferro");
+                impianto.setIndirizzo("Via Casilina 45");
+                impianto.setTipologia("IMPIANTO");
+                impianto.setAttivo(true);
 
-                luogoRepository.save(deposito);
-                luogoRepository.save(cantiere1);
-                luogoRepository.save(impianto1);
-            }
+                deposito = luogoRepository.save(deposito);
+                luogoRepository.save(cantiere);
+                luogoRepository.save(impianto);
 
-            if (mezzoRepository.count() == 0) {
-
-                Mezzo mezzo1 = new Mezzo();
-                mezzo1.setTarga("AB123CD");
-                mezzo1.setTipologia("Scarrabile");
-                mezzo1.setAttivo(true);
-
-                Mezzo mezzo2 = new Mezzo();
-                mezzo2.setTarga("EF456GH");
-                mezzo2.setTipologia("Scarrabile");
-                mezzo2.setAttivo(true);
-
-                mezzoRepository.save(mezzo1);
-                mezzoRepository.save(mezzo2);
+            } else {
+                deposito = luogoRepository.findAll().get(0);
             }
 
             if (cassoneRepository.count() == 0) {
 
-                Cassone cassone1 = new Cassone();
-                cassone1.setCodiceCassone("CAS-001");
-                cassone1.setColore("Blu");
-                cassone1.setTipologia("Aperto");
-                cassone1.setAttivo(true);
+                Cassone cassone1 = new Cassone(
+                        "CAS-001",
+                        "Aperto",
+                        "Blu",
+                        "6 x 2,5 m",
+                        true,
+                        "30 mc",
+                        deposito,
+                        LocalDateTime.now()
+                );
 
-                Cassone cassone2 = new Cassone();
-                cassone2.setCodiceCassone("CAS-002");
-                cassone2.setColore("Rosso");
-                cassone2.setTipologia("Aperto");
-                cassone2.setAttivo(true);
+                Cassone cassone2 = new Cassone(
+                        "CAS-002",
+                        "Aperto",
+                        "Rosso",
+                        "6 x 2,5 m",
+                        true,
+                        "30 mc",
+                        deposito,
+                        LocalDateTime.now()
+                );
 
-                Cassone cassone3 = new Cassone();
-                cassone3.setCodiceCassone("CAS-003");
-                cassone3.setColore("Verde");
-                cassone3.setTipologia("Chiuso");
-                cassone3.setAttivo(true);
+                Cassone cassone3 = new Cassone(
+                        "CAS-003",
+                        "Chiuso",
+                        "Verde",
+                        "5 x 2,5 m",
+                        true,
+                        "20 mc",
+                        deposito,
+                        LocalDateTime.now()
+                );
 
                 cassoneRepository.save(cassone1);
                 cassoneRepository.save(cassone2);
