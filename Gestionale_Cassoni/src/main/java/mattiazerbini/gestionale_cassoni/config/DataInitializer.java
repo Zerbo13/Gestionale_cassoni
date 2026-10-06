@@ -88,17 +88,17 @@ public class DataInitializer {
 
                 Mezzo mezzo1 = new Mezzo();
                 mezzo1.setTarga("AB123CD");
-                mezzo1.setTipo("Iveco");
+                mezzo1.setTipologia("Iveco");
                 mezzo1.setAttivo(true);
 
                 Mezzo mezzo2 = new Mezzo();
                 mezzo2.setTarga("EF456GH");
-                mezzo2.setTipo("Iveco");
+                mezzo2.setTipologia("Iveco");
                 mezzo2.setAttivo(true);
 
                 Mezzo mezzo3 = new Mezzo();
                 mezzo3.setTarga("IJ789KL");
-                mezzo3.setTipo("Mercedes");
+                mezzo3.setTipologia("Mercedes");
                 mezzo3.setAttivo(true);
 
                 mezzoRepository.save(mezzo1);
