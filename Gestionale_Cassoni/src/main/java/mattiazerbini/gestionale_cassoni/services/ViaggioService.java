@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class ViaggioService {
 
     private final ViaggioRepository viaggioRepository;
+
+    private final ZoneId zonaItalia = ZoneId.of("Europe/Rome");
 
     public ViaggioService(ViaggioRepository viaggioRepository) {
         this.viaggioRepository = viaggioRepository;
@@ -49,11 +52,13 @@ public class ViaggioService {
 
     public List<Viaggio> trovaViaggiDiOggi() {
 
+        LocalDate oggi = LocalDate.now(zonaItalia);
+
         LocalDateTime dataInizio =
-                LocalDate.now().atStartOfDay();
+                oggi.atStartOfDay();
 
         LocalDateTime dataFine =
-                LocalDate.now()
+                oggi
                         .plusDays(1)
                         .atStartOfDay();
 
@@ -164,7 +169,7 @@ public class ViaggioService {
         }
 
         viaggio.setDataOraInizio(
-                LocalDateTime.now()
+                LocalDateTime.now(zonaItalia)
         );
 
         viaggio.setStato(
@@ -190,7 +195,7 @@ public class ViaggioService {
         }
 
         viaggio.setDataOraFine(
-                LocalDateTime.now()
+                LocalDateTime.now(zonaItalia)
         );
 
         viaggio.setStato(
@@ -230,7 +235,7 @@ public class ViaggioService {
                 dataArrivo.toLocalDate();
 
         LocalDate oggi =
-                LocalDate.now();
+                LocalDate.now(zonaItalia);
 
         long giorni = 0;
 
