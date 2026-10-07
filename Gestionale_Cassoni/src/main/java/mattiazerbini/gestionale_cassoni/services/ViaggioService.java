@@ -43,6 +43,10 @@ public class ViaggioService {
         return viaggioRepository.findById(id);
     }
 
+    public Viaggio salvaViaggio(Viaggio viaggio) {
+        return viaggioRepository.save(viaggio);
+    }
+
     public List<Viaggio> trovaViaggiDiOggi() {
 
         LocalDateTime dataInizio =
@@ -85,7 +89,9 @@ public class ViaggioService {
 
                 viaggio.getStato(),
 
-                viaggio.getNote()
+                viaggio.getNote(),
+
+                viaggio.getFotoUrl()
         );
     }
 
@@ -172,16 +178,24 @@ public class ViaggioService {
 
         Viaggio viaggio = viaggioRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Viaggio non trovato"));
+                .orElseThrow(() ->
+                        new NotFoundException("Viaggio non trovato")
+                );
 
         if (viaggio.getStato() != StatoViaggio.IN_CORSO) {
 
-            throw new BadRequestException("Puoi chiudere solo un viaggio in corso");
+            throw new BadRequestException(
+                    "Puoi chiudere solo un viaggio in corso"
+            );
         }
 
-        viaggio.setDataOraFine(LocalDateTime.now());
+        viaggio.setDataOraFine(
+                LocalDateTime.now()
+        );
 
-        viaggio.setStato(StatoViaggio.COMPLETATO);
+        viaggio.setStato(
+                StatoViaggio.COMPLETATO
+        );
 
         return viaggioRepository.save(viaggio);
     }
@@ -190,11 +204,15 @@ public class ViaggioService {
 
         Viaggio viaggio = viaggioRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Viaggio non trovato"));
+                .orElseThrow(() ->
+                        new NotFoundException("Viaggio non trovato")
+                );
 
         if (viaggio.getStato() != StatoViaggio.IN_CORSO) {
 
-            throw new BadRequestException("Puoi annullare solo un viaggio in corso");
+            throw new BadRequestException(
+                    "Puoi annullare solo un viaggio in corso"
+            );
         }
 
         viaggio.setStato(
@@ -208,18 +226,20 @@ public class ViaggioService {
             LocalDateTime dataArrivo
     ) {
 
-        LocalDate dataInizio = dataArrivo.toLocalDate();
+        LocalDate dataInizio =
+                dataArrivo.toLocalDate();
 
-        LocalDate oggi = LocalDate.now();
+        LocalDate oggi =
+                LocalDate.now();
 
         long giorni = 0;
 
-        LocalDate data = dataInizio.plusDays(1);
+        LocalDate data =
+                dataInizio.plusDays(1);
 
         while (!data.isAfter(oggi)) {
 
             if (data.getDayOfWeek() != DayOfWeek.SUNDAY) {
-
                 giorni++;
             }
 
@@ -229,58 +249,98 @@ public class ViaggioService {
         return giorni;
     }
 
-    public PosizioneCassoneResponse trovaPosizioneAttualeCassone(Cassone cassone) {
+    public PosizioneCassoneResponse trovaPosizioneAttualeCassone(
+            Cassone cassone
+    ) {
 
-        Optional<Viaggio> viaggioInCorso = viaggioRepository
+        Optional<Viaggio> viaggioInCorso =
+                viaggioRepository
                         .findFirstByCassoneIdAndStatoOrderByDataOraInizioDesc(
-                                cassone.getId(), StatoViaggio.IN_CORSO);
+                                cassone.getId(),
+                                StatoViaggio.IN_CORSO
+                        );
 
         if (viaggioInCorso.isPresent()) {
 
-            return new PosizioneCassoneResponse(cassone.getCodiceCassone(),
+            return new PosizioneCassoneResponse(
+                    cassone.getCodiceCassone(),
 
-                    "In viaggio verso " + viaggioInCorso
+                    "In viaggio verso "
+                            + viaggioInCorso
                             .get()
                             .getDestinazione()
                             .getNome(),
-                    0);
+
+                    0
+            );
         }
 
-        Optional<Viaggio> ultimoViaggioCompletato = viaggioRepository
+        Optional<Viaggio> ultimoViaggioCompletato =
+                viaggioRepository
                         .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(
                                 cassone.getId(),
-                                StatoViaggio.COMPLETATO);
+                                StatoViaggio.COMPLETATO
+                        );
 
         if (ultimoViaggioCompletato.isPresent()) {
 
-            Viaggio ultimoViaggio = ultimoViaggioCompletato.get();
+            Viaggio ultimoViaggio =
+                    ultimoViaggioCompletato.get();
 
-            long giorniFermo = calcolaGiorniFermo(ultimoViaggio.getDataOraFine());
+            long giorniFermo =
+                    calcolaGiorniFermo(
+                            ultimoViaggio.getDataOraFine()
+                    );
 
-            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), ultimoViaggio
+            return new PosizioneCassoneResponse(
+                    cassone.getCodiceCassone(),
+
+                    ultimoViaggio
                             .getDestinazione()
                             .getNome(),
-                    giorniFermo);
+
+                    giorniFermo
+            );
         }
 
-        if (cassone.getPosizioneIniziale() != null &&
-            cassone.getDataPosizioneIniziale() != null) {
+        if (
+                cassone.getPosizioneIniziale() != null
+                        && cassone.getDataPosizioneIniziale() != null
+        ) {
 
-            long giorniFermo = calcolaGiorniFermo(cassone.getDataPosizioneIniziale());
+            long giorniFermo =
+                    calcolaGiorniFermo(
+                            cassone.getDataPosizioneIniziale()
+                    );
 
-            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), cassone
+            return new PosizioneCassoneResponse(
+                    cassone.getCodiceCassone(),
+
+                    cassone
                             .getPosizioneIniziale()
                             .getNome(),
-                    giorniFermo);
+
+                    giorniFermo
+            );
         }
 
         if (cassone.getPosizioneIniziale() != null) {
 
-            return new PosizioneCassoneResponse(cassone.getCodiceCassone(), cassone
+            return new PosizioneCassoneResponse(
+                    cassone.getCodiceCassone(),
+
+                    cassone
                             .getPosizioneIniziale()
-                            .getNome(), 0);
+                            .getNome(),
+
+                    0
+            );
         }
 
-        return new PosizioneCassoneResponse(cassone.getCodiceCassone(), "Posizione non disponibile", 0);
+        return new PosizioneCassoneResponse(
+                cassone.getCodiceCassone(),
+                "Posizione non disponibile",
+                0
+        );
     }
 }

@@ -5,6 +5,7 @@ import mattiazerbini.gestionale_cassoni.entities.StatoViaggio;
 import java.time.LocalDateTime;
 
 public class ViaggioResponse {
+
     private Long id;
     private String operaio;
     private String mezzo;
@@ -15,6 +16,7 @@ public class ViaggioResponse {
     private LocalDateTime dataOraFine;
     private StatoViaggio stato;
     private String note;
+    private String fotoUrl;
 
     public ViaggioResponse() {
     }
@@ -29,7 +31,8 @@ public class ViaggioResponse {
             LocalDateTime dataOraInizio,
             LocalDateTime dataOraFine,
             StatoViaggio stato,
-            String note
+            String note,
+            String fotoUrl
     ) {
         this.id = id;
         this.operaio = operaio;
@@ -41,6 +44,7 @@ public class ViaggioResponse {
         this.dataOraFine = dataOraFine;
         this.stato = stato;
         this.note = note;
+        this.fotoUrl = fotoUrl;
     }
 
     public Long getId() {
@@ -121,5 +125,13 @@ public class ViaggioResponse {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }

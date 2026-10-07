@@ -44,6 +44,9 @@ public class Viaggio {
 
     private String note;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     public Viaggio() {
     }
 
@@ -56,7 +59,8 @@ public class Viaggio {
             LocalDateTime dataOraInizio,
             LocalDateTime dataOraFine,
             StatoViaggio stato,
-            String note
+            String note,
+            String fotoUrl
     ) {
         this.utente = utente;
         this.mezzo = mezzo;
@@ -67,6 +71,7 @@ public class Viaggio {
         this.dataOraFine = dataOraFine;
         this.stato = stato;
         this.note = note;
+        this.fotoUrl = fotoUrl;
     }
 
     public Long getId() {
@@ -147,5 +152,13 @@ public class Viaggio {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }
