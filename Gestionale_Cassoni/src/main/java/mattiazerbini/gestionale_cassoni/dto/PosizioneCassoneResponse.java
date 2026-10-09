@@ -5,15 +5,32 @@ public class PosizioneCassoneResponse {
     private String cassone;
     private String posizione;
     private long giorniFermo;
+    private String note;
 
-    private PosizioneCassoneResponse(){
+    private PosizioneCassoneResponse() {
 
     }
 
-    public PosizioneCassoneResponse(String cassone, String posizione, long giorniFermo){
+    public PosizioneCassoneResponse(
+            String cassone,
+            String posizione,
+            long giorniFermo
+    ) {
         this.cassone = cassone;
         this.posizione = posizione;
         this.giorniFermo = giorniFermo;
+    }
+
+    public PosizioneCassoneResponse(
+            String cassone,
+            String posizione,
+            long giorniFermo,
+            String note
+    ) {
+        this.cassone = cassone;
+        this.posizione = posizione;
+        this.giorniFermo = giorniFermo;
+        this.note = note;
     }
 
     public String getCassone() {
@@ -38,5 +55,13 @@ public class PosizioneCassoneResponse {
 
     public void setGiorniFermo(long giorniFermo) {
         this.giorniFermo = giorniFermo;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }
