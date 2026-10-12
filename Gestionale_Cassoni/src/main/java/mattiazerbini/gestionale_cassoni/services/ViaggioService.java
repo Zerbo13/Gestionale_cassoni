@@ -99,7 +99,19 @@ public class ViaggioService {
 
                 viaggio.getPartenza().getNome(),
 
-                viaggio.getDestinazione().getNome(),
+                viaggio.getDestinazione().getNome()
+                        + (
+                        viaggio.getDestinazione().getIndirizzo() != null
+                                && !viaggio.getDestinazione().getIndirizzo().isBlank()
+                                ? " - " + viaggio.getDestinazione().getIndirizzo()
+                                : ""
+                )
+                        + (
+                        viaggio.getDestinazione().getTipologia() != null
+                                && !viaggio.getDestinazione().getTipologia().isBlank()
+                                ? " - " + viaggio.getDestinazione().getTipologia()
+                                : ""
+                ),
 
                 viaggio.getDataOraInizio(),
 
@@ -328,6 +340,7 @@ public class ViaggioService {
 
             Viaggio viaggio =
                     viaggioInCorso.get();
+
 
             return new PosizioneCassoneResponse(
                     cassone.getCodiceCassone(),
