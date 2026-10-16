@@ -35,8 +35,23 @@ public class Cassone {
     @JoinColumn(name = "posizione_iniziale_id")
     private Luogo posizioneIniziale;
 
+
+    // =====================================================
+    // BLOCCO CASSONE
+    // =====================================================
+
+    private Boolean bloccato = false;
+
+    @ManyToOne
+    @JoinColumn(name = "bloccato_da_utente_id")
+    private Utente bloccatoDa;
+
+    private String motivoBlocco;
+
+
     public Cassone() {
     }
+
 
     public Cassone(
             String codiceCassone,
@@ -58,77 +73,125 @@ public class Cassone {
         this.dataPosizioneIniziale = dataPosizioneIniziale;
     }
 
+
     public Long getId() {
         return id;
     }
+
 
     public void setId(Long id) {
         this.id = id;
     }
 
+
     public String getCodiceCassone() {
         return codiceCassone;
     }
+
 
     public void setCodiceCassone(String codiceCassone) {
         this.codiceCassone = codiceCassone;
     }
 
+
     public String getTipologia() {
         return tipologia;
     }
+
 
     public void setTipologia(String tipologia) {
         this.tipologia = tipologia;
     }
 
+
     public String getColore() {
         return colore;
     }
+
 
     public void setColore(String colore) {
         this.colore = colore;
     }
 
+
     public String getMisura() {
         return misura;
     }
+
 
     public void setMisura(String misura) {
         this.misura = misura;
     }
 
+
     public String getCapacità() {
         return capacità;
     }
+
 
     public void setCapacità(String capacità) {
         this.capacità = capacità;
     }
 
+
     public Boolean getAttivo() {
         return attivo;
     }
+
 
     public void setAttivo(Boolean attivo) {
         this.attivo = attivo;
     }
 
+
     public Luogo getPosizioneIniziale() {
         return posizioneIniziale;
     }
+
 
     public void setPosizioneIniziale(Luogo posizioneIniziale) {
         this.posizioneIniziale = posizioneIniziale;
     }
 
+
     public LocalDateTime getDataPosizioneIniziale() {
         return dataPosizioneIniziale;
     }
+
 
     public void setDataPosizioneIniziale(
             LocalDateTime dataPosizioneIniziale
     ) {
         this.dataPosizioneIniziale = dataPosizioneIniziale;
+    }
+
+
+    public Boolean getBloccato() {
+        return bloccato;
+    }
+
+
+    public void setBloccato(Boolean bloccato) {
+        this.bloccato = bloccato;
+    }
+
+
+    public Utente getBloccatoDa() {
+        return bloccatoDa;
+    }
+
+
+    public void setBloccatoDa(Utente bloccatoDa) {
+        this.bloccatoDa = bloccatoDa;
+    }
+
+
+    public String getMotivoBlocco() {
+        return motivoBlocco;
+    }
+
+
+    public void setMotivoBlocco(String motivoBlocco) {
+        this.motivoBlocco = motivoBlocco;
     }
 }

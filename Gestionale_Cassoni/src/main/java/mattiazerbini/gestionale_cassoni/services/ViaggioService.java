@@ -7,6 +7,7 @@ import mattiazerbini.gestionale_cassoni.entities.StatoViaggio;
 import mattiazerbini.gestionale_cassoni.entities.Viaggio;
 import mattiazerbini.gestionale_cassoni.exceptions.BadRequestException;
 import mattiazerbini.gestionale_cassoni.exceptions.NotFoundException;
+import mattiazerbini.gestionale_cassoni.repositories.CassoneRepository;
 import mattiazerbini.gestionale_cassoni.repositories.ViaggioRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,17 @@ import java.util.Optional;
 public class ViaggioService {
 
     private final ViaggioRepository viaggioRepository;
+    private final CassoneRepository cassoneRepository;
 
     private final ZoneId zonaItalia = ZoneId.of("Europe/Rome");
 
-    public ViaggioService(ViaggioRepository viaggioRepository) {
+
+    public ViaggioService(
+            ViaggioRepository viaggioRepository,
+            CassoneRepository cassoneRepository
+    ) {
         this.viaggioRepository = viaggioRepository;
+        this.cassoneRepository = cassoneRepository;
     }
 
 
@@ -128,9 +135,16 @@ public class ViaggioService {
 
     public Viaggio avviaViaggio(Viaggio viaggio) {
 
+        Cassone cassone = viaggio.getCassone();
+
+
+        // =====================================================
+        // CONTROLLO CASSONE GIÀ IN VIAGGIO
+        // =====================================================
+
         boolean cassoneOccupato =
                 viaggioRepository.existsByCassoneIdAndStato(
-                        viaggio.getCassone().getId(),
+                        cassone.getId(),
                         StatoViaggio.IN_CORSO
                 );
 
@@ -141,6 +155,45 @@ public class ViaggioService {
             );
         }
 
+
+        // =====================================================
+        // CONTROLLO CASSONE BLOCCATO / RISERVATO
+        // =====================================================
+
+        if (Boolean.TRUE.equals(cassone.getBloccato())) {
+
+            if (cassone.getBloccatoDa() == null) {
+
+                throw new BadRequestException(
+                        "Questo cassone è momentaneamente bloccato. Contatta l'amministratore."
+                );
+            }
+
+
+            if (
+                    !cassone
+                            .getBloccatoDa()
+                            .getId()
+                            .equals(
+                                    viaggio
+                                            .getUtente()
+                                            .getId()
+                            )
+            ) {
+
+                throw new BadRequestException(
+                        "Questo cassone è riservato a "
+                                + cassone.getBloccatoDa().getNome()
+                                + " "
+                                + cassone.getBloccatoDa().getCognome()
+                );
+            }
+        }
+
+
+        // =====================================================
+        // CONTROLLO MEZZO
+        // =====================================================
 
         boolean mezzoOccupato =
                 viaggioRepository.existsByMezzoIdAndStato(
@@ -156,6 +209,10 @@ public class ViaggioService {
         }
 
 
+        // =====================================================
+        // CONTROLLO AUTISTA
+        // =====================================================
+
         boolean autistaOccupato =
                 viaggioRepository.existsByUtenteIdAndStato(
                         viaggio.getUtente().getId(),
@@ -170,10 +227,14 @@ public class ViaggioService {
         }
 
 
+        // =====================================================
+        // CALCOLO PARTENZA CASSONE
+        // =====================================================
+
         Optional<Viaggio> ultimoViaggioCompletato =
                 viaggioRepository
                         .findFirstByCassoneIdAndStatoOrderByDataOraFineDesc(
-                                viaggio.getCassone().getId(),
+                                cassone.getId(),
                                 StatoViaggio.COMPLETATO
                         );
 
@@ -189,9 +250,7 @@ public class ViaggioService {
         } else {
 
             if (
-                    viaggio
-                            .getCassone()
-                            .getPosizioneIniziale() == null
+                    cassone.getPosizioneIniziale() == null
             ) {
 
                 throw new BadRequestException(
@@ -199,10 +258,9 @@ public class ViaggioService {
                 );
             }
 
+
             viaggio.setPartenza(
-                    viaggio
-                            .getCassone()
-                            .getPosizioneIniziale()
+                    cassone.getPosizioneIniziale()
             );
         }
 
@@ -254,6 +312,39 @@ public class ViaggioService {
         );
 
 
+        // =====================================================
+        // SBLOCCO AUTOMATICO DEL CASSONE
+        // =====================================================
+
+        Cassone cassone =
+                viaggio.getCassone();
+
+
+        if (
+                Boolean.TRUE.equals(cassone.getBloccato())
+                        &&
+                        cassone.getBloccatoDa() != null
+                        &&
+                        cassone
+                                .getBloccatoDa()
+                                .getId()
+                                .equals(
+                                        viaggio
+                                                .getUtente()
+                                                .getId()
+                                )
+        ) {
+
+            cassone.setBloccato(false);
+
+            cassone.setBloccatoDa(null);
+
+            cassone.setMotivoBlocco(null);
+
+            cassoneRepository.save(cassone);
+        }
+
+
         return viaggioRepository.save(viaggio);
     }
 
@@ -285,6 +376,14 @@ public class ViaggioService {
                 StatoViaggio.ANNULLATO
         );
 
+
+        /*
+         * IMPORTANTE:
+         *
+         * Se il viaggio viene ANNULLATO il cassone NON viene sbloccato.
+         *
+         * Quindi continuerà ad essere riservato allo stesso operaio.
+         */
 
         return viaggioRepository.save(viaggio);
     }
