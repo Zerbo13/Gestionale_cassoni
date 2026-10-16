@@ -1356,7 +1356,7 @@ public class DataInitializer implements CommandLineRunner {
             cassone27.setMisura("3 assi");
             cassone27.setAttivo(true);
             cassone27.setPosizioneIniziale(luogo12);
-            cassone27.setDataPosizioneIniziale(LocalDateTime.of(2026, 90, 29, 8,0));
+            cassone27.setDataPosizioneIniziale(LocalDateTime.of(2026, 9, 29, 8,0));
 
             Cassone cassone28 = new Cassone();
             cassone28.setCodiceCassone("36");
