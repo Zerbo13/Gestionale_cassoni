@@ -385,6 +385,7 @@ public class ViaggioService {
          * Quindi continuerà ad essere riservato allo stesso operaio.
          */
 
+
         return viaggioRepository.save(viaggio);
     }
 
@@ -441,13 +442,22 @@ public class ViaggioService {
                     viaggioInCorso.get();
 
 
+            String destinazione =
+                    viaggio
+                            .getDestinazione()
+                            .getNome()
+                            + (
+                            viaggio.getDestinazione().getIndirizzo() != null
+                                    && !viaggio.getDestinazione().getIndirizzo().isBlank()
+                                    ? " - " + viaggio.getDestinazione().getIndirizzo()
+                                    : ""
+                    );
+
+
             return new PosizioneCassoneResponse(
                     cassone.getCodiceCassone(),
 
-                    "In viaggio verso "
-                            + viaggio
-                            .getDestinazione()
-                            .getNome(),
+                    "In viaggio verso " + destinazione,
 
                     0,
 
@@ -477,12 +487,22 @@ public class ViaggioService {
                     );
 
 
+            String posizione =
+                    ultimoViaggio
+                            .getDestinazione()
+                            .getNome()
+                            + (
+                            ultimoViaggio.getDestinazione().getIndirizzo() != null
+                                    && !ultimoViaggio.getDestinazione().getIndirizzo().isBlank()
+                                    ? " - " + ultimoViaggio.getDestinazione().getIndirizzo()
+                                    : ""
+                    );
+
+
             return new PosizioneCassoneResponse(
                     cassone.getCodiceCassone(),
 
-                    ultimoViaggio
-                            .getDestinazione()
-                            .getNome(),
+                    posizione,
 
                     giorniFermo,
 
@@ -504,12 +524,22 @@ public class ViaggioService {
                     );
 
 
+            String posizioneIniziale =
+                    cassone
+                            .getPosizioneIniziale()
+                            .getNome()
+                            + (
+                            cassone.getPosizioneIniziale().getIndirizzo() != null
+                                    && !cassone.getPosizioneIniziale().getIndirizzo().isBlank()
+                                    ? " - " + cassone.getPosizioneIniziale().getIndirizzo()
+                                    : ""
+                    );
+
+
             return new PosizioneCassoneResponse(
                     cassone.getCodiceCassone(),
 
-                    cassone
-                            .getPosizioneIniziale()
-                            .getNome(),
+                    posizioneIniziale,
 
                     giorniFermo,
 
@@ -522,12 +552,22 @@ public class ViaggioService {
                 cassone.getPosizioneIniziale() != null
         ) {
 
+            String posizioneIniziale =
+                    cassone
+                            .getPosizioneIniziale()
+                            .getNome()
+                            + (
+                            cassone.getPosizioneIniziale().getIndirizzo() != null
+                                    && !cassone.getPosizioneIniziale().getIndirizzo().isBlank()
+                                    ? " - " + cassone.getPosizioneIniziale().getIndirizzo()
+                                    : ""
+                    );
+
+
             return new PosizioneCassoneResponse(
                     cassone.getCodiceCassone(),
 
-                    cassone
-                            .getPosizioneIniziale()
-                            .getNome(),
+                    posizioneIniziale,
 
                     0,
 
