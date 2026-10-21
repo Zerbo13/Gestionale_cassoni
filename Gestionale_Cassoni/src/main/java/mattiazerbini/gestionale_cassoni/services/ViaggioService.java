@@ -279,6 +279,10 @@ public class ViaggioService {
     }
 
 
+    // =====================================================
+    // CHIUDI VIAGGIO
+    // =====================================================
+
     public Viaggio chiudiViaggio(Long id) {
 
         Viaggio viaggio =
@@ -349,6 +353,11 @@ public class ViaggioService {
     }
 
 
+    // =====================================================
+    // ANNULLA VIAGGIO OPERAIO
+    // SOLO SE ANCORA IN CORSO
+    // =====================================================
+
     public Viaggio annullaViaggio(Long id) {
 
         Viaggio viaggio =
@@ -378,11 +387,63 @@ public class ViaggioService {
 
 
         /*
-         * IMPORTANTE:
+         * Se il viaggio viene annullato dall'operaio,
+         * il cassone NON viene sbloccato.
          *
-         * Se il viaggio viene ANNULLATO il cassone NON viene sbloccato.
+         * Se era riservato continuerà quindi
+         * ad essere riservato allo stesso operaio.
+         */
+
+
+        return viaggioRepository.save(viaggio);
+    }
+
+
+    // =====================================================
+    // ANNULLA VIAGGIO COMPLETATO - ADMIN
+    // =====================================================
+
+    public Viaggio annullaViaggioCompletatoAdmin(Long id) {
+
+        Viaggio viaggio =
+                viaggioRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new NotFoundException(
+                                        "Viaggio non trovato"
+                                )
+                        );
+
+
+        if (
+                viaggio.getStato()
+                        != StatoViaggio.COMPLETATO
+        ) {
+
+            throw new BadRequestException(
+                    "L'admin può annullare solo un viaggio completato"
+            );
+        }
+
+
+        viaggio.setStato(
+                StatoViaggio.ANNULLATO
+        );
+
+
+        /*
+         * Non dobbiamo modificare manualmente
+         * la posizione del cassone.
          *
-         * Quindi continuerà ad essere riservato allo stesso operaio.
+         * La posizione viene calcolata cercando
+         * l'ultimo viaggio COMPLETATO.
+         *
+         * Appena questo viaggio diventa ANNULLATO,
+         * verrà automaticamente preso il viaggio
+         * completato precedente.
+         *
+         * Se non esistono viaggi precedenti,
+         * verrà utilizzata la posizione iniziale.
          */
 
 
