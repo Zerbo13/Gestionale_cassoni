@@ -279,10 +279,6 @@ public class ViaggioService {
     }
 
 
-    // =====================================================
-    // CHIUDI VIAGGIO
-    // =====================================================
-
     public Viaggio chiudiViaggio(Long id) {
 
         Viaggio viaggio =
@@ -353,11 +349,6 @@ public class ViaggioService {
     }
 
 
-    // =====================================================
-    // ANNULLA VIAGGIO OPERAIO
-    // SOLO SE ANCORA IN CORSO
-    // =====================================================
-
     public Viaggio annullaViaggio(Long id) {
 
         Viaggio viaggio =
@@ -387,13 +378,12 @@ public class ViaggioService {
 
 
         /*
-         * Se il viaggio viene annullato dall'operaio,
-         * il cassone NON viene sbloccato.
+         * IMPORTANTE:
          *
-         * Se era riservato continuerà quindi
-         * ad essere riservato allo stesso operaio.
+         * Se il viaggio viene ANNULLATO il cassone NON viene sbloccato.
+         *
+         * Quindi continuerà ad essere riservato allo stesso operaio.
          */
-
 
         return viaggioRepository.save(viaggio);
     }
@@ -421,7 +411,7 @@ public class ViaggioService {
         ) {
 
             throw new BadRequestException(
-                    "L'admin può annullare solo un viaggio completato"
+                    "Puoi annullare solo un viaggio completato"
             );
         }
 
@@ -429,22 +419,6 @@ public class ViaggioService {
         viaggio.setStato(
                 StatoViaggio.ANNULLATO
         );
-
-
-        /*
-         * Non dobbiamo modificare manualmente
-         * la posizione del cassone.
-         *
-         * La posizione viene calcolata cercando
-         * l'ultimo viaggio COMPLETATO.
-         *
-         * Appena questo viaggio diventa ANNULLATO,
-         * verrà automaticamente preso il viaggio
-         * completato precedente.
-         *
-         * Se non esistono viaggi precedenti,
-         * verrà utilizzata la posizione iniziale.
-         */
 
 
         return viaggioRepository.save(viaggio);
@@ -644,4 +618,5 @@ public class ViaggioService {
                 null
         );
     }
+
 }

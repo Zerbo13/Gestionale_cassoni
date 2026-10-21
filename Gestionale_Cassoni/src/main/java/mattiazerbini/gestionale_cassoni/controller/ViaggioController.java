@@ -35,6 +35,7 @@ public class ViaggioController {
     private final MezzoService mezzoService;
     private final CloudinaryService cloudinaryService;
 
+
     public ViaggioController(
             ViaggioService viaggioService,
             CassoneService cassoneService,
@@ -42,12 +43,18 @@ public class ViaggioController {
             MezzoService mezzoService,
             CloudinaryService cloudinaryService
     ) {
+
         this.viaggioService = viaggioService;
         this.cassoneService = cassoneService;
         this.luogoService = luogoService;
         this.mezzoService = mezzoService;
         this.cloudinaryService = cloudinaryService;
     }
+
+
+    // =====================================================
+    // TUTTI I VIAGGI
+    // =====================================================
 
     @GetMapping
     public List<ViaggioResponse> getTuttiIViaggi() {
@@ -59,6 +66,11 @@ public class ViaggioController {
                 .toList();
     }
 
+
+    // =====================================================
+    // VIAGGIO PER ID
+    // =====================================================
+
     @GetMapping("/{id}")
     public ResponseEntity<Viaggio> getViaggioPerId(
             @PathVariable Long id
@@ -67,11 +79,18 @@ public class ViaggioController {
         Viaggio viaggio = viaggioService
                 .trovaViaggioPerId(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Viaggio non trovato")
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
                 );
 
         return ResponseEntity.ok(viaggio);
     }
+
+
+    // =====================================================
+    // AVVIA VIAGGIO
+    // =====================================================
 
     @PostMapping("/avvia")
     public ViaggioResponse avviaViaggio(
@@ -82,41 +101,57 @@ public class ViaggioController {
         Utente utente =
                 (Utente) authentication.getPrincipal();
 
+
         Mezzo mezzo = mezzoService
                 .trovaMezzoPerId(request.getMezzoId())
                 .orElseThrow(() ->
-                        new NotFoundException("Mezzo non trovato")
+                        new NotFoundException(
+                                "Mezzo non trovato"
+                        )
                 );
 
+
         if (!mezzo.getAttivo()) {
+
             throw new BadRequestException(
                     "Il mezzo selezionato è disattivato"
             );
         }
 
+
         Cassone cassone = cassoneService
                 .trovaCassonePerId(request.getCassoneId())
                 .orElseThrow(() ->
-                        new NotFoundException("Cassone non trovato")
+                        new NotFoundException(
+                                "Cassone non trovato"
+                        )
                 );
 
+
         if (!cassone.getAttivo()) {
+
             throw new BadRequestException(
                     "Il cassone è disattivato"
             );
         }
 
+
         Luogo destinazione = luogoService
                 .trovaLuogoPerId(request.getDestinazioneId())
                 .orElseThrow(() ->
-                        new NotFoundException("Destinazione non trovata")
+                        new NotFoundException(
+                                "Destinazione non trovata"
+                        )
                 );
 
+
         if (!destinazione.getAttivo()) {
+
             throw new BadRequestException(
                     "La destinazione è disattivata"
             );
         }
+
 
         Viaggio viaggio = new Viaggio();
 
@@ -126,12 +161,19 @@ public class ViaggioController {
         viaggio.setDestinazione(destinazione);
         viaggio.setNote(request.getNote());
 
+
         Viaggio viaggioSalvato =
                 viaggioService.avviaViaggio(viaggio);
+
 
         return viaggioService
                 .convetiInResponse(viaggioSalvato);
     }
+
+
+    // =====================================================
+    // FOTO VIAGGIO
+    // =====================================================
 
     @PostMapping("/{id}/foto")
     public ViaggioResponse caricaFotoViaggio(
@@ -143,18 +185,23 @@ public class ViaggioController {
         Utente utente =
                 (Utente) authentication.getPrincipal();
 
+
         Viaggio viaggio = viaggioService
                 .trovaViaggioPerId(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Viaggio non trovato")
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
                 );
+
 
         if (
                 utente.getRuolo() != Ruolo.ADMIN
-                        && !viaggio
-                        .getUtente()
-                        .getId()
-                        .equals(utente.getId())
+                        &&
+                        !viaggio
+                                .getUtente()
+                                .getId()
+                                .equals(utente.getId())
         ) {
 
             throw new ForbiddenException(
@@ -162,23 +209,38 @@ public class ViaggioController {
             );
         }
 
-        if (foto == null || foto.isEmpty()) {
+
+        if (
+                foto == null
+                        ||
+                        foto.isEmpty()
+        ) {
+
             throw new BadRequestException(
                     "La foto è vuota"
             );
         }
 
+
         String fotoUrl =
                 cloudinaryService.caricaFoto(foto);
 
+
         viaggio.setFotoUrl(fotoUrl);
+
 
         Viaggio viaggioAggiornato =
                 viaggioService.salvaViaggio(viaggio);
 
+
         return viaggioService
                 .convetiInResponse(viaggioAggiornato);
     }
+
+
+    // =====================================================
+    // CHIUDI VIAGGIO
+    // =====================================================
 
     @PutMapping("/{id}/chiudi")
     public ViaggioResponse chiudiViaggio(
@@ -189,18 +251,23 @@ public class ViaggioController {
         Utente utente =
                 (Utente) authentication.getPrincipal();
 
+
         Viaggio viaggio = viaggioService
                 .trovaViaggioPerId(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Viaggio non trovato")
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
                 );
+
 
         if (
                 utente.getRuolo() != Ruolo.ADMIN
-                        && !viaggio
-                        .getUtente()
-                        .getId()
-                        .equals(utente.getId())
+                        &&
+                        !viaggio
+                                .getUtente()
+                                .getId()
+                                .equals(utente.getId())
         ) {
 
             throw new ForbiddenException(
@@ -208,12 +275,19 @@ public class ViaggioController {
             );
         }
 
+
         Viaggio viaggioChiuso =
                 viaggioService.chiudiViaggio(id);
+
 
         return viaggioService
                 .convetiInResponse(viaggioChiuso);
     }
+
+
+    // =====================================================
+    // ANNULLA VIAGGIO IN CORSO
+    // =====================================================
 
     @PutMapping("/{id}/annulla")
     public ViaggioResponse annullaViaggio(
@@ -224,18 +298,23 @@ public class ViaggioController {
         Utente utente =
                 (Utente) authentication.getPrincipal();
 
+
         Viaggio viaggio = viaggioService
                 .trovaViaggioPerId(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Viaggio non trovato")
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
                 );
+
 
         if (
                 utente.getRuolo() != Ruolo.ADMIN
-                        && !viaggio
-                        .getUtente()
-                        .getId()
-                        .equals(utente.getId())
+                        &&
+                        !viaggio
+                                .getUtente()
+                                .getId()
+                                .equals(utente.getId())
         ) {
 
             throw new ForbiddenException(
@@ -243,12 +322,67 @@ public class ViaggioController {
             );
         }
 
+
         Viaggio viaggioAnnullato =
                 viaggioService.annullaViaggio(id);
+
 
         return viaggioService
                 .convetiInResponse(viaggioAnnullato);
     }
+
+
+    // =====================================================
+    // ANNULLA VIAGGIO COMPLETATO
+    // SOLO ADMIN
+    // =====================================================
+
+    @PutMapping("/{id}/annulla-completato-admin")
+    public ViaggioResponse annullaViaggioCompletatoAdmin(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+
+        Utente utente =
+                (Utente) authentication.getPrincipal();
+
+
+        // SOLO L'ADMIN PUÒ ESEGUIRE QUESTA OPERAZIONE
+        if (
+                utente.getRuolo()
+                        != Ruolo.ADMIN
+        ) {
+
+            throw new ForbiddenException(
+                    "Solo l'amministratore può annullare un viaggio completato"
+            );
+        }
+
+
+        Viaggio viaggio = viaggioService
+                .trovaViaggioPerId(id)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Viaggio non trovato"
+                        )
+                );
+
+
+        Viaggio viaggioAnnullato =
+                viaggioService
+                        .annullaViaggioCompletatoAdmin(
+                                viaggio.getId()
+                        );
+
+
+        return viaggioService
+                .convetiInResponse(viaggioAnnullato);
+    }
+
+
+    // =====================================================
+    // VIAGGI PER CASSONE
+    // =====================================================
 
     @GetMapping("/cassone/{cassoneId}")
     public List<ViaggioResponse> getViaggiPerCassone(
@@ -262,6 +396,11 @@ public class ViaggioController {
                 .toList();
     }
 
+
+    // =====================================================
+    // VIAGGI DELL'UTENTE LOGGATO
+    // =====================================================
+
     @GetMapping("/miei")
     public List<ViaggioResponse> getViaggiMiei(
             Authentication authentication
@@ -270,12 +409,20 @@ public class ViaggioController {
         Utente utente =
                 (Utente) authentication.getPrincipal();
 
+
         return viaggioService
-                .trovaViaggiPerUtente(utente.getId())
+                .trovaViaggiPerUtente(
+                        utente.getId()
+                )
                 .stream()
                 .map(viaggioService::convetiInResponse)
                 .toList();
     }
+
+
+    // =====================================================
+    // VIAGGI DI OGGI
+    // =====================================================
 
     @GetMapping("/oggi")
     public List<ViaggioResponse> getViaggiPerOggi() {
