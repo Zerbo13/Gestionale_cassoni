@@ -1,7 +1,7 @@
+
 package mattiazerbini.gestionale_cassoni.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public class CassoneRequest {
 
@@ -14,19 +14,23 @@ public class CassoneRequest {
     @NotBlank(message = "La misura è obbligatoria")
     private String misura;
 
-    @NotBlank(message = "La tipologia è obbligatoria")
+    // Facoltativi
     private String tipologia;
-
-    @NotBlank(message = "La capacità è obbligatoria")
     private String capacità;
-
-    @NotNull(message = "La posizione iniziale è obbligatoria")
     private Long posizioneInizialeId;
+    private Boolean attivo;
 
     public CassoneRequest() {
     }
 
-    public CassoneRequest(String codiceCassone, String colore, String misura, String tipologia, String capacità, Long posizioneInizialeId) {
+    public CassoneRequest(
+            String codiceCassone,
+            String colore,
+            String misura,
+            String tipologia,
+            String capacità,
+            Long posizioneInizialeId
+    ) {
         this.codiceCassone = codiceCassone;
         this.colore = colore;
         this.misura = misura;
@@ -81,5 +85,13 @@ public class CassoneRequest {
 
     public void setPosizioneInizialeId(Long posizioneInizialeId) {
         this.posizioneInizialeId = posizioneInizialeId;
+    }
+
+    public Boolean getAttivo() {
+        return attivo;
+    }
+
+    public void setAttivo(Boolean attivo) {
+        this.attivo = attivo;
     }
 }
